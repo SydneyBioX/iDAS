@@ -1,12 +1,15 @@
 Package: iDAS
-Title: What the Package Does (One Line, Title Case)
+Title: Interpretable differential abundance analysis
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    person("Lijia", "Yu", , "yulj2010@gmail.com", role = c("aut", "cre"))
+Description: Single-cell technologies have revolutionized our understanding of cellular dynamics by allowing researchers to investigate individual cell responses under various conditions, such as comparing diseased versus healthy states. To better interpret the gene signatures generated in the differential abundance analysis, we developed iDAS to classify the gene signatures into multiple categories.
+License: GPL
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+biocViews:
+Imports:
+    stats,
+    lme4
+BugReports: https://github.com/SydneyBioX/iDAS/issues
