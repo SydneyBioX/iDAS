@@ -1,260 +1,256 @@
-
 #' Interpretable differential abundance analysis (two-way analysis)
 #'
 #' @param Z A matrix/dataframe of omics or gene expression data, row as sample.
-#' @param f1 A vector of factor 1 variables.
-#' @param f2 A vector of factor 2 variables.
-#' @param random A vector of random effect term of ANOVA analysis,
-#' by default is NULL, which means the model doesn't include random effect term.
-#' @param test_func Testing function used, either stats::lm or lme4::lmer. By default is "lm".
-#' @param Sig_cutoff No effect test significance level is defined by a fraction value
-#' to indicate when ordering the p-values
-#' and defining the top X% as the significance level. If both Sig_cutoff and Sig
-#' are set, the algorithm will, by default, use Sig_cutoff to determine
-#' the significance level.
-#' @param Sig No effect test significance level is defined directly
-#' by a fraction value, by default is 0.05
-#' @param Int Interaction effect test significance level,by default is 0.01
-#' @param F1 F1 effect test significance level, by default is 0.01
-#' @param F2 F2 effect test significance level, by default is 0.01
-#' @param adj_method Pvalue adjust method. See p.adjust. By default is "BH".
-#' @param f1name The column name of factor 1, by default is F1.
-#' @param f2name The column name of factor 2, by default is F2.
-#' @param randomname The column name of random effect term, by default is Random.
+#' @param factor1 A vector of the first factor variable.
+#' @param factor2 A vector of the second factor variable.
+#' @param random_effect A vector of the random effect term of ANOVA analysis,
+#' by default is NULL, which means the model doesn't include a random effect term.
+#' @param model_fit_function Model fitting function used, either stats::lm or lme4::lmer. By default is "lm".
+#' @param pval_quantile_cutoff A fraction used to determine the significance threshold
+#' for the overall (full) model p-values.
+#' @param pval_cutoff_full The p-value threshold for the overall (full) model, by default is 0.05.
+#' @param pval_cutoff_interaction The p-value threshold for the interaction effect, by default is 0.01.
+#' @param pval_cutoff_factor1 The p-value threshold for the main effect of factor1, by default is 0.01.
+#' @param pval_cutoff_factor2 The p-value threshold for the main effect of factor2, by default is 0.01.
+#' @param p_adjust_method P-value adjustment method. See p.adjust. By default is "BH".
+#' @param factor1_name The column name of the first factor variable, by default is "factor1".
+#' @param factor2_name The column name of the second factor variable, by default is "factor2".
+#' @param random_effect_name The column name of the random effect term, by default is "random_effect".
 #'
-#' @return A list of hypothesis test outcome, P_mat is the pvalue matrix of all tests,
-#' S_mat is the statistics matrix of all test, cls_df is the Classification data frame of all tests.
+#' @return A list of hypothesis test outcomes. pval_matrix is the matrix of p-values for all tests,
+#' stat_matrix is the matrix of test statistics, and class_df is the data frame of class results.
 #' @export
 #' @importFrom stats anova formula p.adjust
 #' @importFrom lme4 lmer
-#' @examples # res=iDAS_2F(Z= X,
-#' #f1=pcelltype,f2=pcell_stats,random=NULL,test_func="lm",
-#' #Sig_cutoff=0.02, Sig = 0.1,Int= 0.01, F1 = 0.01,F2 = 0.01,
-#' #adj_method="BH",f1name=NULL,f2name=NULL,randomname=NULL)
+#' @examples
+#' # res = iDAS_2F(Z = X,
+#' #               factor1 = pcelltype, factor2 = pcell_stats, random_effect = NULL,
+#' #               model_fit_function = "lm",
+#' #               pval_quantile_cutoff = 0.02, pval_cutoff_full = 0.05,
+#' #               pval_cutoff_interaction = 0.01, pval_cutoff_factor1 = 0.01, pval_cutoff_factor2 = 0.01,
+#' #               p_adjust_method = "BH", factor1_name = NULL, factor2_name = NULL, random_effect_name = NULL)
+iDAS_2F = function(Z, factor1, factor2, random_effect = NULL,
+                   model_fit_function = "lm",
+                   pval_quantile_cutoff = 0.02, pval_cutoff_full = 0.05,
+                   pval_cutoff_interaction = 0.01, pval_cutoff_factor1 = 0.01, pval_cutoff_factor2 = 0.01,
+                   p_adjust_method = "BH", factor1_name = NULL, factor2_name = NULL, random_effect_name = NULL) {
 
-iDAS_2F=function(Z,f1,f2,random=NULL,test_func="lm",
-              Sig_cutoff=0.02, Sig = 0.05,Int= 0.01, F1 = 0.01,F2 = 0.01,
-              adj_method="BH",f1name=NULL,f2name=NULL,randomname=NULL){
+  pval_matrix = stat_matrix <- matrix(NA, nrow = ncol(Z), ncol = 4)
 
-  P_mat =S_mat<- matrix(NA, nrow = ncol(Z), ncol = 4)
-  if(test_func=="lm"&is.null(random)){
+  # Format factor variables and names
+  formatted_factors = check_factor_name(factor1_name, factor2_name, random_effect_name, factor1, factor2, random_effect)
 
-    factor_tmp=check_factor_name(f1name,f2name,randomname,f1,f2,random)
-    lm_full <- paste("Y~(", factor_tmp$f1_tmp, ")*(", factor_tmp$f2_tmp, ")",
-                     sep = "")
-    lm_int_alt <- paste("Y~(", factor_tmp$f1_tmp, "):(", factor_tmp$f2_tmp, ")",
-                        sep = "")
-    lm_int_null <- paste("Y~(", factor_tmp$f1_tmp, ")+(", factor_tmp$f2_tmp,
-                         ")", sep = "")
-    lm_f1 <- paste("Y~(", factor_tmp$f1_tmp, ")", sep = "")
-    lm_f2 <- paste("Y~(", factor_tmp$f2_tmp, ")", sep = "")
-
-  }else if(test_func=="lmer"&(!is.null(random))){
-
-    factor_tmp=check_factor_name(f1name,f2name,randomname,f1,f2,random)
-    lm_full <- paste("Y~(",  factor_tmp$f1_tmp, ")*(", factor_tmp$f2_tmp,
-                     ")+(1|",factor_tmp$random_tmp,")", sep = "")
-    lm_int_alt <- paste("Y~(",  factor_tmp$f1_tmp, "):(", factor_tmp$f2_tmp,
-                        ")+(1|",factor_tmp$random_tmp,")", sep = "")
-    lm_int_null <- paste("Y~(",  factor_tmp$f1_tmp, ")+(", factor_tmp$f2_tmp,
-                         ")+(1|",factor_tmp$random_tmp,")",sep = "")
-    lm_f1 <- paste("Y~(",  factor_tmp$f1_tmp, ")+(1|",
-                   factor_tmp$random_tmp,")",sep = "")
-    lm_f2 <- paste("Y~(", factor_tmp$f2_tmp, ")+(1|",
-                   factor_tmp$random_tmp,")", sep = "")
-
-  }else{
-    print("wrong!")
+  # Build model formulas based on the fitting function and random effects
+  if(model_fit_function == "lm" & is.null(random_effect)) {
+    formula_full <- paste("Y ~ (", formatted_factors$factor1_tmp, ")*(", formatted_factors$factor2_tmp, ")", sep = "")
+    formula_interaction_alt <- paste("Y ~ (", formatted_factors$factor1_tmp, "):(", formatted_factors$factor2_tmp, ")", sep = "")
+    formula_interaction_null <- paste("Y ~ (", formatted_factors$factor1_tmp, ")+(", formatted_factors$factor2_tmp, ")", sep = "")
+    formula_factor1 <- paste("Y ~ (", formatted_factors$factor1_tmp, ")", sep = "")
+    formula_factor2 <- paste("Y ~ (", formatted_factors$factor2_tmp, ")", sep = "")
+  } else if(model_fit_function == "lmer" & (!is.null(random_effect))) {
+    formula_full <- paste("Y ~ (", formatted_factors$factor1_tmp, ")*(", formatted_factors$factor2_tmp,
+                          ") + (1|", formatted_factors$random_effect_tmp, ")", sep = "")
+    formula_interaction_alt <- paste("Y ~ (", formatted_factors$factor1_tmp, "):(", formatted_factors$factor2_tmp,
+                                     ") + (1|", formatted_factors$random_effect_tmp, ")", sep = "")
+    formula_interaction_null <- paste("Y ~ (", formatted_factors$factor1_tmp, ")+(", formatted_factors$factor2_tmp,
+                                      ") + (1|", formatted_factors$random_effect_tmp, ")", sep = "")
+    formula_factor1 <- paste("Y ~ (", formatted_factors$factor1_tmp, ") + (1|", formatted_factors$random_effect_tmp, ")", sep = "")
+    formula_factor2 <- paste("Y ~ (", formatted_factors$factor2_tmp, ") + (1|", formatted_factors$random_effect_tmp, ")", sep = "")
+  } else {
+    stop("Invalid model specification: For 'lm', random_effect must be NULL; for 'lmer', random_effect must be provided.")
   }
 
-  lm_formula=c("full" = lm_full, "int_null" = lm_int_null,
-               "int_alt" = lm_int_alt,
-               "f1" = lm_f1, "f2" = lm_f2)
+  lm_formula = c("full" = formula_full, "int_null" = formula_interaction_null,
+                 "int_alt" = formula_interaction_alt,
+                 "f1" = formula_factor1, "f2" = formula_factor2)
 
-  p_sig =s_sig= c()
-  sig_level=list()
+  pval_full = stat_full = c()  # p-values and stats from the full (overall) test
 
-  if(test_func=="lm"&is.null(random)){
-    calc0 <- "Y~1"
-    func=get("lm")
-    calc1 <- lm_formula[1]
-  }else{
-    calc0 <- "Y~1+(1|random)"
-    func=get("lmer")
-    calc1 <- lm_formula[1]
+  if(model_fit_function == "lm" & is.null(random_effect)) {
+    null_model_formula <- "Y ~ 1"
+    fit_model_fn = get("lm")
+    alt_model_formula <- lm_formula[1]
+  } else {
+    null_model_formula <- "Y ~ 1 + (1|random_effect)"
+    fit_model_fn = get("lmer")
+    alt_model_formula <- lm_formula[1]
   }
 
+  # Loop over features in Z
   for (i in 1:ncol(Z)) {
-
-    if(test_func=="lm"&is.null(random)){
-      dat <- data.frame(Y = Z[, i], f1, f2)
-      M0 <- func(formula(calc0), data = dat)
-      M1 <- func(formula(calc1), data = dat)
+    if(model_fit_function == "lm" & is.null(random_effect)) {
+      dat <- data.frame(Y = Z[, i], formatted_factors$factor1, formatted_factors$factor2)
+      M0 <- fit_model_fn(formula(null_model_formula), data = dat)
+      M1 <- fit_model_fn(formula(alt_model_formula), data = dat)
       anova_res <- anova(M0, M1, test = "F")
-      p <- anova_res[2,ncol(anova_res)]
-      S <-  anova_res[2,ncol(anova_res)-1]
-    }else{
-
-      dat <- data.frame(Y = Z[, i], f1, f2,random)
-      M0 <- func(formula(calc0), data = dat)
-      M1 <- func(formula(calc1), data = dat)
-      anova_res <- anova(M0, M1, test = "F",refit=FALSE)
-      p <- anova_res[2,ncol(anova_res)]
-      S <-  anova_res[2,ncol(anova_res)-2]
+      p <- anova_res[2, ncol(anova_res)]
+      S <- anova_res[2, ncol(anova_res) - 1]
+    } else {
+      dat <- data.frame(Y = Z[, i], formatted_factors$factor1, formatted_factors$factor2,
+                        random_effect = formatted_factors$random_effect)
+      M0 <- fit_model_fn(formula(null_model_formula), data = dat)
+      M1 <- fit_model_fn(formula(alt_model_formula), data = dat)
+      anova_res <- anova(M0, M1, test = "F", refit = FALSE)
+      p <- anova_res[2, ncol(anova_res)]
+      S <- anova_res[2, ncol(anova_res) - 2]
     }
-
-    p_sig[i] <-p
-    s_sig[i]=S
-  }
-  if (is.null(adj_method)) {
-    p_sig_adj <- p_sig
-  }else {
-    p_sig_adj <- p.adjust(p_sig, method = adj_method)
+    pval_full[i] <- p
+    stat_full[i] <- S
   }
 
-  P_mat[, 1] <- p_sig_adj
-  S_mat[,1]=s_sig
-  cls <- rep("sig", ncol(Z))
-  if(!is.null(Sig_cutoff)){
-    cutoff=sort(p_sig_adj)[length(p_sig_adj)*Sig_cutoff] # adjusted p value 1 problem
-    cls[p_sig_adj > cutoff] <- "non-sig"
-    cls_df <- data.frame(Sig0 = cls)
-    idx_sig <- which(cls=="sig")
-    if(length(idx_sig)>1){
-      Z_tmp <- Z[, idx_sig]
-    }else{
-      Z_tmp <- data.frame(Z[, idx_sig] )
-      colnames(Z_tmp)=colnames(Z)[idx_sig]
-      rownames(Z_tmp)=rownames(Z)
-    }
-  }else if(Sig){
-    cls[p_sig_adj > Sig] <- "non-sig"
-    cls_df <- data.frame(Sig0 = cls)
-    idx_sig <- which(cls=="sig")
-    if(length(idx_sig)>1){
-      Z_tmp <- Z[, idx_sig]
-    }else{
-      Z_tmp <- data.frame(Z[, idx_sig] )
-      colnames(Z_tmp)=colnames(Z)[idx_sig]
-      rownames(Z_tmp)=rownames(Z)
-    }
-
+  if (is.null(p_adjust_method)) {
+    p_sig_adj <- pval_full
+  } else {
+    p_sig_adj <- p.adjust(pval_full, method = p_adjust_method)
   }
 
+  pval_matrix[, 1] <- p_sig_adj
+  stat_matrix[, 1] <- stat_full
 
-  p_int_tmp=s_int_tmp  <- rep(NA, ncol(Z_tmp))
-  p_f1_tmp=s_f1_tmp <- rep(NA, ncol(Z_tmp))
-  p_f2_tmp=s_f2_tmp <- rep(NA, ncol(Z_tmp))
+  overall_class <- rep("sig", ncol(Z))
+  if (!is.null(pval_quantile_cutoff)) {
+    cutoff = sort(p_sig_adj)[length(p_sig_adj) * pval_quantile_cutoff]
+    overall_class[p_sig_adj > cutoff] <- "non-sig"
+    class_df <- data.frame(Sig0 = overall_class)
+    sig_feature_indices <- which(overall_class == "sig")
+    if (length(sig_feature_indices) > 1) {
+      Z_sig <- Z[, sig_feature_indices]
+    } else {
+      Z_sig <- data.frame(Z[, sig_feature_indices])
+      colnames(Z_sig) <- colnames(Z)[sig_feature_indices]
+      rownames(Z_sig) <- rownames(Z)
+    }
+  } else if(pval_cutoff_full) {
+    overall_class[p_sig_adj > pval_cutoff_full] <- "non-sig"
+    class_df <- data.frame(Sig0 = overall_class)
+    sig_feature_indices <- which(overall_class == "sig")
+    if (length(sig_feature_indices) > 1) {
+      Z_sig <- Z[, sig_feature_indices]
+    } else {
+      Z_sig <- data.frame(Z[, sig_feature_indices])
+      colnames(Z_sig) <- colnames(Z)[sig_feature_indices]
+      rownames(Z_sig) <- rownames(Z)
+    }
+  }
 
-  for (i in 1:ncol(Z_tmp)) {
+  # Initialize temporary variables for the interaction and main effect tests
+  pval_interaction = stat_interaction <- rep(NA, ncol(Z_sig))
+  pval_factor1 = stat_factor1 <- rep(NA, ncol(Z_sig))
+  pval_factor2 = stat_factor2 <- rep(NA, ncol(Z_sig))
 
-    if(test_func=="lm"&is.null(random)){
+  for (i in 1:ncol(Z_sig)) {
+    # Interaction test: compare formula_interaction_null vs. formula_full
+    if(model_fit_function == "lm" & is.null(random_effect)) {
       calc0 <- lm_formula["int_null"]
       calc1 <- lm_formula["full"]
-      dat <- data.frame(Y = Z_tmp[, i], f1, f2)
-      M0 <- func(formula(calc0), data = dat)
-      M1 <- func(formula(calc1), data = dat)
+      dat <- data.frame(Y = Z_sig[, i], formatted_factors$factor1, formatted_factors$factor2)
+      M0 <- fit_model_fn(formula(calc0), data = dat)
+      M1 <- fit_model_fn(formula(calc1), data = dat)
       anova_res <- anova(M0, M1, test = "F")
-      p <- anova_res[2,ncol(anova_res)]
-      S <-  anova_res[2,ncol(anova_res)-1]
-    }else{
+      p <- anova_res[2, ncol(anova_res)]
+      S <- anova_res[2, ncol(anova_res) - 1]
+    } else {
       calc0 <- lm_formula["int_null"]
       calc1 <- lm_formula["full"]
-      dat <- data.frame(Y = Z_tmp[, i], f1, f2,random)
-      M0 <- func(formula(calc0), data = dat)
-      M1 <- func(formula(calc1), data = dat)
-      anova_res <- anova(M0, M1, test = "F",refit=FALSE)
-      p <- anova_res[2,ncol(anova_res)]
-      S <-  anova_res[2,ncol(anova_res)-2]
+      dat <- data.frame(Y = Z_sig[, i], formatted_factors$factor1, formatted_factors$factor2,
+                        random_effect = formatted_factors$random_effect)
+      M0 <- fit_model_fn(formula(calc0), data = dat)
+      M1 <- fit_model_fn(formula(calc1), data = dat)
+      anova_res <- anova(M0, M1, test = "F", refit = FALSE)
+      p <- anova_res[2, ncol(anova_res)]
+      S <- anova_res[2, ncol(anova_res) - 2]
     }
+    pval_interaction[i] <- p
+    stat_interaction[i] <- S
 
-    p_int_tmp[i] <- p
-    s_int_tmp[i] <- S
-
-    if(test_func=="lm"&is.null(random)){
+    # Main effect test for factor1: use formula_factor2 as null vs. formula_interaction_null
+    if(model_fit_function == "lm" & is.null(random_effect)) {
       calc0 <- lm_formula["f2"]
       calc1 <- lm_formula["int_null"]
-      dat <- data.frame(Y = Z_tmp[, i], f1, f2)
-      M0 <- func(formula(calc0), data = dat)
-      M1 <- func(formula(calc1), data = dat)
+      dat <- data.frame(Y = Z_sig[, i], formatted_factors$factor1, formatted_factors$factor2)
+      M0 <- fit_model_fn(formula(calc0), data = dat)
+      M1 <- fit_model_fn(formula(calc1), data = dat)
       anova_res <- anova(M0, M1, test = "F")
-      p <- anova_res[2,ncol(anova_res)]
-      S <-  anova_res[2,ncol(anova_res)-1]
-    }else{
+      p <- anova_res[2, ncol(anova_res)]
+      S <- anova_res[2, ncol(anova_res) - 1]
+    } else {
       calc0 <- lm_formula["f2"]
       calc1 <- lm_formula["int_null"]
-      dat <- data.frame(Y = Z_tmp[, i], f1, f2,random)
-      M0 <- func(formula(calc0), data = dat)
-      M1 <- func(formula(calc1), data = dat)
-      anova_res <- anova(M0, M1, test = "F",refit=FALSE)
-      p <- anova_res[2,ncol(anova_res)]
-      S <-  anova_res[2,ncol(anova_res)-2]
+      dat <- data.frame(Y = Z_sig[, i], formatted_factors$factor1, formatted_factors$factor2,
+                        random_effect = formatted_factors$random_effect)
+      M0 <- fit_model_fn(formula(calc0), data = dat)
+      M1 <- fit_model_fn(formula(calc1), data = dat)
+      anova_res <- anova(M0, M1, test = "F", refit = FALSE)
+      p <- anova_res[2, ncol(anova_res)]
+      S <- anova_res[2, ncol(anova_res) - 2]
     }
+    pval_factor1[i] <- p
+    stat_factor1[i] <- S
 
-    p_f1_tmp[i] <- p
-    s_f1_tmp[i] <- S
-
-
-    if(test_func=="lm"&is.null(random)){
+    # Main effect test for factor2: use formula_factor1 as null vs. formula_interaction_null
+    if(model_fit_function == "lm" & is.null(random_effect)) {
       calc0 <- lm_formula["f1"]
       calc1 <- lm_formula["int_null"]
-      dat <- data.frame(Y = Z_tmp[, i], f1, f2)
-      M0 <- func(formula(calc0), data = dat)
-      M1 <- func(formula(calc1), data = dat)
+      dat <- data.frame(Y = Z_sig[, i], formatted_factors$factor1, formatted_factors$factor2)
+      M0 <- fit_model_fn(formula(calc0), data = dat)
+      M1 <- fit_model_fn(formula(calc1), data = dat)
       anova_res <- anova(M0, M1, test = "F")
-      p <- anova_res[2,ncol(anova_res)]
-      S <-  anova_res[2,ncol(anova_res)-1]
-    }else{
+      p <- anova_res[2, ncol(anova_res)]
+      S <- anova_res[2, ncol(anova_res) - 1]
+    } else {
       calc0 <- lm_formula["f1"]
       calc1 <- lm_formula["int_null"]
-      dat <- data.frame(Y = Z_tmp[, i], f1, f2,random)
-      M0 <- func(formula(calc0), data = dat)
-      M1 <- func(formula(calc1), data = dat)
-      anova_res <- anova(M0, M1, test = "F",refit=FALSE)
-      p <- anova_res[2,ncol(anova_res)]
-      S <-  anova_res[2,ncol(anova_res)-2]
+      dat <- data.frame(Y = Z_sig[, i], formatted_factors$factor1, formatted_factors$factor2,
+                        random_effect = formatted_factors$random_effect)
+      M0 <- fit_model_fn(formula(calc0), data = dat)
+      M1 <- fit_model_fn(formula(calc1), data = dat)
+      anova_res <- anova(M0, M1, test = "F", refit = FALSE)
+      p <- anova_res[2, ncol(anova_res)]
+      S <- anova_res[2, ncol(anova_res) - 2]
     }
-    p_f2_tmp[i] <- p
-    s_f2_tmp[i] <- S
+    pval_factor2[i] <- p
+    stat_factor2[i] <- S
   }
 
-
-  if (is.null(adj_method)) {
-    P_mat[idx_sig, 2] = p_int_tmp
-    P_mat[idx_sig, 3] = p_f1_tmp
-    P_mat[idx_sig, 4] = p_f2_tmp
-    S_mat[idx_sig, 2] = s_int_tmp
-    S_mat[idx_sig, 3] = s_f1_tmp
-    S_mat[idx_sig, 4] = s_f2_tmp
-  }else {
-    P_mat[idx_sig, 2] = p.adjust(p_int_tmp,method = adj_method)
-    P_mat[idx_sig, 3] = p.adjust(p_f1_tmp,method = adj_method)
-    P_mat[idx_sig, 4] = p.adjust(p_f2_tmp,method = adj_method)
-    S_mat[idx_sig, 2] = s_int_tmp
-    S_mat[idx_sig, 3] = s_f1_tmp
-    S_mat[idx_sig, 4] = s_f2_tmp
+  # Adjust p-values for the interaction and main effects
+  if (is.null(p_adjust_method)) {
+    pval_matrix[sig_feature_indices, 2] = pval_interaction
+    pval_matrix[sig_feature_indices, 3] = pval_factor1
+    pval_matrix[sig_feature_indices, 4] = pval_factor2
+    stat_matrix[sig_feature_indices, 2] = stat_interaction
+    stat_matrix[sig_feature_indices, 3] = stat_factor1
+    stat_matrix[sig_feature_indices, 4] = stat_factor2
+  } else {
+    pval_interaction = p.adjust(pval_interaction, method = p_adjust_method)
+    pval_factor1 = p.adjust(pval_factor1, method = p_adjust_method)
+    pval_factor2 = p.adjust(pval_factor2, method = p_adjust_method)
+    pval_matrix[sig_feature_indices, 2] = pval_interaction
+    pval_matrix[sig_feature_indices, 3] = pval_factor1
+    pval_matrix[sig_feature_indices, 4] = pval_factor2
+    stat_matrix[sig_feature_indices, 2] = stat_interaction
+    stat_matrix[sig_feature_indices, 3] = stat_factor1
+    stat_matrix[sig_feature_indices, 4] = stat_factor2
   }
 
-  cls_int_tmp <- rep("Add", ncol(Z_tmp))
-  cls_int_tmp[p_int_tmp < Int] = "Int"
-  names(cls_int_tmp) <- colnames(Z_tmp)
-  cls_tmp <- rep(NA, ncol(Z))
-  idx_add <- which(cls_int_tmp == "Add")
-  cls_tmp1 <- cls_int_tmp[idx_add]
-  p_f2_tmp1 <- p_f2_tmp[idx_add]
-  p_f1_tmp1 <- p_f1_tmp[idx_add]
-  cls_tmp1[(p_f2_tmp1 <= F2) & (p_f1_tmp1 > F1)] = "F2"
-  cls_tmp1[(p_f2_tmp1 >F2) & (p_f1_tmp1 <= F1)] = "F1"
-  cls_int_tmp[idx_add] <- cls_tmp1
-  cls_tmp[idx_sig] <- cls_int_tmp
-  cls_df$Sig1 <- cls_tmp
-  cls_df$varname <- colnames(Z)
-  colnames(P_mat) = colnames(S_mat) <- c("Sig", "Interaction", "F1",
-                       "F2")
+  interaction_class <- rep("Additive", ncol(Z_sig))
+  interaction_class[pval_interaction < pval_cutoff_interaction] = "Interaction"
+  names(interaction_class) <- colnames(Z_sig)
+  overall_class <- rep(NA, ncol(Z))
+  idx_add <- which(interaction_class == "Additive")
+  overall_class_subset <- interaction_class[idx_add]
+  pval_factor2_subset <- pval_factor2[idx_add]
+  pval_factor1_subset <- pval_factor1[idx_add]
+  overall_class_subset[(pval_factor2_subset <= pval_cutoff_factor2) & (pval_factor1_subset > pval_cutoff_factor1)] = "Factor2"
+  overall_class_subset[(pval_factor2_subset > pval_cutoff_factor2) & (pval_factor1_subset <= pval_cutoff_factor1)] = "Factor1"
+  interaction_class[idx_add] <- overall_class_subset
+  overall_class[sig_feature_indices] <- interaction_class
+  class_df$Sig1 <- overall_class
+  class_df$varname <- colnames(Z)
+  colnames(pval_matrix) = colnames(stat_matrix) <- c("Full", "Interaction", "Factor1", "Factor2")
+  rownames(pval_matrix) = rownames(stat_matrix) <- colnames(Z)
+  rownames(class_df) <- colnames(Z)
 
-  rownames(P_mat) =rownames(S_mat) <- colnames(Z)
-  rownames(cls_df) <- colnames(Z)
-  return(list(P_mat=P_mat,S_mat=S_mat,cls_df=cls_df))
+  return(list(pval_matrix = pval_matrix, stat_matrix = stat_matrix, class_df = class_df))
 }
 
 
@@ -264,70 +260,79 @@ iDAS_2F=function(Z,f1,f2,random=NULL,test_func="lm",
 
 #' Check the iDAS_2F input factors' name
 #'
-#' @param f1name a string of factor 1's name
-#' @param f2name a string of factor 2's name
-#' @param randomname a string of random effect term's name
-#' @param f1  A vector of factor 1 variables.
-#' @param f2  A vector of factor 2 variables.
-#' @param random  A vector of random effect term variables.
+#' @param factor1_name A string for the first factor variable's name.
+#' @param factor2_name A string for the second factor variable's name.
+#' @param random_effect_name A string for the random effect term's name.
+#' @param factor1 A vector of the first factor variable.
+#' @param factor2 A vector of the second factor variable.
+#' @param random_effect A vector of the random effect term variables.
 #'
-#' @return A list of each factor's name and values
+#' @return A list of each factor's name and values.
 #'
-#' @examples  #factor_tmp=check_factor_name(f1name,f2name,randomname,f1,f2,random)
-check_factor_name=function(f1name,f2name,randomname,f1,f2,random){
-  if (is.null(f1name)) {
-    f1name = "f1"
+#' @examples
+#' # formatted_factors = check_factor_name(factor1_name, factor2_name, random_effect_name, factor1, factor2, random_effect)
+check_factor_name = function(factor1_name, factor2_name, random_effect_name, factor1, factor2, random_effect) {
+  if (is.null(factor1_name)) {
+    factor1_name = "factor1"
   }
-  if (is.null(f2name)) {
-    f2name = "f2"
+  if (is.null(factor2_name)) {
+    factor2_name = "factor2"
   }
-  if (is.null(randomname)) {
-    randomname = "random"
+  if (is.null(random_effect_name)) {
+    random_effect_name = "random_effect"
   }
 
-  if (is.factor(f1)) {
-    f1 <- data.frame(f1)
-    colnames(f1) <- f1name
-  }else if (is.vector(f1)) {
-    f1 <- data.frame(f1)
-    colnames(f1) <- f1name
+  if (is.factor(factor1)) {
+    factor1 <- data.frame(factor1)
+    colnames(factor1) <- factor1_name
+  } else if (is.vector(factor1)) {
+    factor1 <- data.frame(factor1)
+    colnames(factor1) <- factor1_name
   }
-  f1name <- colnames(f1)
-  if (is.factor(f2)) {
-    f2 <- data.frame(f2)
-    colnames(f2) <- f2name
-  }else if (is.vector(f2)) {
-    f2 <- data.frame(f2)
-    colnames(f2) <- f2name
+  factor1_name <- colnames(factor1)
+
+  if (is.factor(factor2)) {
+    factor2 <- data.frame(factor2)
+    colnames(factor2) <- factor2_name
+  } else if (is.vector(factor2)) {
+    factor2 <- data.frame(factor2)
+    colnames(factor2) <- factor2_name
   }
-  f2name <- colnames(f2)
-  if(is.null(random)){
-    random=NULL
-  }else{
-    if (is.factor(random)) {
-      random <- data.frame(random)
-      colnames(random) <- randomname
-    }else if (is.vector(random)) {
-      random <- data.frame(random)
-      colnames(random) <- randomname
+  factor2_name <- colnames(factor2)
+
+  if(is.null(random_effect)) {
+    random_effect = NULL
+  } else {
+    if (is.factor(random_effect)) {
+      random_effect <- data.frame(random_effect)
+      colnames(random_effect) <- random_effect_name
+    } else if (is.vector(random_effect)) {
+      random_effect <- data.frame(random_effect)
+      colnames(random_effect) <- random_effect_name
     }
   }
-  randomname=colnames(random)
-  if (length(f1name) > 1) {
-    f1_tmp <- paste(f1name, collapse = "+")
-  }else {
-    f1_tmp <- f1name
+  random_effect_name = colnames(random_effect)
+
+  if (length(factor1_name) > 1) {
+    factor1_tmp <- paste(factor1_name, collapse = "+")
+  } else {
+    factor1_tmp <- factor1_name
   }
-  if (length(f2name) > 1) {
-    f2_tmp <- paste(f2name, collapse = "+")
-  }else {
-    f2_tmp <- f2name
+  if (length(factor2_name) > 1) {
+    factor2_tmp <- paste(factor2_name, collapse = "+")
+  } else {
+    factor2_tmp <- factor2_name
+  }
+  if (!is.null(random_effect)) {
+    if (length(random_effect_name) > 1) {
+      random_effect_tmp <- paste(random_effect_name, collapse = "+")
+    } else {
+      random_effect_tmp <- random_effect_name
+    }
+  } else {
+    random_effect_tmp <- NULL
   }
 
-  if (length(randomname) > 1) {
-    random_tmp <- paste(randomname, collapse = "+")
-  }else {
-    random_tmp <- randomname
-  }
-  return(list(f1_tmp=f1_tmp,f2_tmp=f2_tmp,random_tmp=random_tmp,f1=f1,f2=f2,random=random))
+  return(list(factor1_tmp = factor1_tmp, factor2_tmp = factor2_tmp, random_effect_tmp = random_effect_tmp,
+              factor1 = factor1, factor2 = factor2, random_effect = random_effect))
 }
