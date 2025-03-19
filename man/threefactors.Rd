@@ -129,6 +129,7 @@ Multiple testing corrections are applied based on \code{p_adjust_method}.
 # Generate sample data
 set.seed(123)
 Z <- matrix(rnorm(1000), ncol = 10)
+colnames(Z)=paste0("gene",1:10)
 factor1 <- as.factor(rep(1:2, each = 5))
 factor2 <- as.factor(rep(1:2, times = 5))
 factor3 <- as.factor(rep(1:2, length.out = 10))

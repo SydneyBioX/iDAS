@@ -13,24 +13,12 @@ devtools::install_github("SydneyBioX/iDAS")
 
 ## Example
 
-Run a two-way analysis to classify genes based on two relevant factors.
-
 ```{r}
-res=iDAS_2F(Z= X,
- f1=pcelltype,f2=pcell_stats,random=NULL,test_func="lm",
- Sig_cutoff=0.02, Sig = 0.1,Int= 0.01, F1 = 0.01,F2 = 0.01,
- adj_method="BH",f1name=NULL,f2name=NULL,randomname=NULL)
+  # Example using two factors
+  result_twoway <- iDAS(Z = my_feature_matrix, factor1 = group1, factor2 = group2)
 
-```
-
-Run a three-way analysis to classify genes based on three relevant factors.
-
-
-```{r}
-res=iDAS_3F(Z = X,
-f1 = all.timepoint, f2 = all.pcellstats, f3 = all.pcelltype, random = all.pid,
-test_func = "lmer",
-Sig_cutoff = 0.02,Int = 0.01,F1 = 0.01,F2=0.02,F3=0.01,adj_method = "BH")
+  # Example using three factors
+  result_threeway <- iDAS(Z = my_feature_matrix, factor1 = group1, factor2 = group2, factor3 = timepoint)
 ```
 
 

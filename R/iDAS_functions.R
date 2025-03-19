@@ -763,6 +763,7 @@ build_formulas <- function(formatted_factors, test_func, random_effect) {
 #' # Generate sample data
 #' set.seed(123)
 #' Z <- matrix(rnorm(1000), ncol = 10)
+#' colnames(Z)=paste0("gene",1:10)
 #' factor1 <- as.factor(rep(1:2, each = 5))
 #' factor2 <- as.factor(rep(1:2, times = 5))
 #' factor3 <- as.factor(rep(1:2, length.out = 10))
@@ -809,13 +810,15 @@ threefactors <- function(Z, factor1, factor2, factor3, random_effect = NULL, mod
                                   factor1=factor1, factor2=factor2, factor3=factor3, random_effect=random_effect)
 
   # Build all necessary formulas using helper function
-  formulas <- build_formulas(formatted_factors, test_func, random_effect)
+  formulas <- build_formulas(formatted_factors, model_fit_function, random_effect)
 
   # Select base model formula and model fitting function
-  if (test_func == "lm" && is.null(random_effect)) {
+  if (model_fit_function == "lm" && is.null(random_effect)) {
     calc0_overall <- "Y ~ 1"
-  } else {
+  } else if (model_fit_function == "lmer" && !is.null(random_effect)) {
     calc0_overall <- "Y ~ 1 + (1|random_effect)"
+  } else {
+    stop("Mismatch: 'lm' requires random_effect=NULL; 'lmer' requires non-NULL random_effect.")
   }
   calc1_overall <- formulas$lm_full
 
