@@ -6,66 +6,65 @@
 \usage{
 iDAS_2F(
   Z,
-  f1,
-  f2,
-  random = NULL,
-  test_func = "lm",
-  Sig_cutoff = 0.02,
-  Sig = 0.05,
-  Int = 0.01,
-  F1 = 0.01,
-  F2 = 0.01,
-  adj_method = "BH",
-  f1name = NULL,
-  f2name = NULL,
-  randomname = NULL
+  factor1,
+  factor2,
+  random_effect = NULL,
+  model_fit_function = "lm",
+  pval_quantile_cutoff = 0.02,
+  pval_cutoff_full = 0.05,
+  pval_cutoff_interaction = 0.01,
+  pval_cutoff_factor1 = 0.01,
+  pval_cutoff_factor2 = 0.01,
+  p_adjust_method = "BH",
+  factor1_name = NULL,
+  factor2_name = NULL,
+  random_effect_name = NULL
 )
 }
 \arguments{
 \item{Z}{A matrix/dataframe of omics or gene expression data, row as sample.}
 
-\item{f1}{A vector of factor 1 variables.}
+\item{factor1}{A vector of the first factor variable.}
 
-\item{f2}{A vector of factor 2 variables.}
+\item{factor2}{A vector of the second factor variable.}
 
-\item{random}{A vector of random effect term of ANOVA analysis,
-by default is NULL, which means the model doesn't include random effect term.}
+\item{random_effect}{A vector of the random effect term of ANOVA analysis,
+by default is NULL, which means the model doesn't include a random effect term.}
 
-\item{test_func}{Testing function used, either stats::lm or lme4::lmer. By default is "lm".}
+\item{model_fit_function}{Model fitting function used, either stats::lm or lme4::lmer. By default is "lm".}
 
-\item{Sig_cutoff}{No effect test significance level is defined by a fraction value
-to indicate when ordering the p-values
-and defining the top X\% as the significance level. If both Sig_cutoff and Sig
-are set, the algorithm will, by default, use Sig_cutoff to determine
-the significance level.}
+\item{pval_quantile_cutoff}{A fraction used to determine the significance threshold
+for the overall (full) model p-values.}
 
-\item{Sig}{No effect test significance level is defined directly
-by a fraction value, by default is 0.05}
+\item{pval_cutoff_full}{The p-value threshold for the overall (full) model, by default is 0.05.}
 
-\item{Int}{Interaction effect test significance level,by default is 0.01}
+\item{pval_cutoff_interaction}{The p-value threshold for the interaction effect, by default is 0.01.}
 
-\item{F1}{F1 effect test significance level, by default is 0.01}
+\item{pval_cutoff_factor1}{The p-value threshold for the main effect of factor1, by default is 0.01.}
 
-\item{F2}{F2 effect test significance level, by default is 0.01}
+\item{pval_cutoff_factor2}{The p-value threshold for the main effect of factor2, by default is 0.01.}
 
-\item{adj_method}{Pvalue adjust method. See p.adjust. By default is "BH".}
+\item{p_adjust_method}{P-value adjustment method. See p.adjust. By default is "BH".}
 
-\item{f1name}{The column name of factor 1, by default is F1.}
+\item{factor1_name}{The column name of the first factor variable, by default is "factor1".}
 
-\item{f2name}{The column name of factor 2, by default is F2.}
+\item{factor2_name}{The column name of the second factor variable, by default is "factor2".}
 
-\item{randomname}{The column name of random effect term, by default is Random.}
+\item{random_effect_name}{The column name of the random effect term, by default is "random_effect".}
 }
 \value{
-A list of hypothesis test outcome, P_mat is the pvalue matrix of all tests,
-S_mat is the statistics matrix of all test, cls_df is the Classification data frame of all tests.
+A list of hypothesis test outcomes. pval_matrix is the matrix of p-values for all tests,
+stat_matrix is the matrix of test statistics, and class_df is the data frame of class results.
 }
 \description{
-Interpretable differential abundance analysis (two-way analysis)
+This function will be no longer be used.
 }
 \examples{
-# res=iDAS_2F(Z= X,
-#f1=pcelltype,f2=pcell_stats,random=NULL,test_func="lm",
-#Sig_cutoff=0.02, Sig = 0.1,Int= 0.01, F1 = 0.01,F2 = 0.01,
-#adj_method="BH",f1name=NULL,f2name=NULL,randomname=NULL)
+# res = iDAS_2F(Z = X,
+#               factor1 = pcelltype, factor2 = pcell_stats, random_effect = NULL,
+#               model_fit_function = "lm",
+#               pval_quantile_cutoff = 0.02, pval_cutoff_full = 0.05,
+#               pval_cutoff_interaction = 0.01, pval_cutoff_factor1 = 0.01, pval_cutoff_factor2 = 0.01,
+#               p_adjust_method = "BH", factor1_name = NULL, factor2_name = NULL, random_effect_name = NULL)
 }
+\keyword{internal}

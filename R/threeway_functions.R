@@ -1,6 +1,7 @@
 
 #' Interpretable differential abundance analysis (three-way analysis)
 #'
+#' This function will be no longer be used.
 #' @param Z A matrix/dataframe of omics or gene expression data, row as sample.
 #' @param f1 A vector of factor 1 variables.
 #' @param f2 A vector of factor 2 variables.
@@ -31,9 +32,9 @@
 #'
 #' @return A list of hypothesis test outcome, P_mat is the pvalue matrix of all tests,
 #' S_mat is the statistics matrix of all test, cls_df is the Classification data frame of all tests.
-#' @export
 #' @importFrom stats anova formula p.adjust
 #' @importFrom lme4 lmer
+#' @keywords internal
 #' @examples #res=iDAS_3F(Z = X,
 #' #f1 = all.timepoint, f2 = all.pcellstats, f3 = all.pcelltype, random = all.pid, test_func = "lmer",
 #' #Sig_cutoff = 0.02,Int = 0.01,F1 = 0.01,F2=0.02,F3=0.01,adj_method = "BH")
@@ -506,8 +507,9 @@ iDAS_3F=function(Z,f1,f2,f3,random=NULL,test_func="lm",
   return(list(P_mat=P_mat,S_mat=S_mat,cls_df=cls_df))
 }
 
-#' Title
+#' Check the iDAS_3F input factors' name
 #'
+#' This function will be no longer be used.
 #' @param f1name a string of factor 1's name
 #' @param f2name a string of factor 2's name
 #' @param f3name a string of factor 3's name
@@ -518,7 +520,7 @@ iDAS_3F=function(Z,f1,f2,f3,random=NULL,test_func="lm",
 #' @param random A vector of random effect term variables.
 #'
 #' @return A list of each factor's name and values
-#'
+#' @keywords internal
 #' @examples  #factor_tmp=check_factor_name3(f1name,f2name,f2name,randomname,f1,f2,f3,random)
 
 check_factor_name3=function(f1name,f2name,f3name,randomname,f1,f2,f3,random){

@@ -2,7 +2,7 @@
 % Please edit documentation in R/threeway_functions.R
 \name{check_factor_name3}
 \alias{check_factor_name3}
-\title{Title}
+\title{Check the iDAS_3F input factors' name}
 \usage{
 check_factor_name3(f1name, f2name, f3name, randomname, f1, f2, f3, random)
 }
@@ -27,8 +27,9 @@ check_factor_name3(f1name, f2name, f3name, randomname, f1, f2, f3, random)
 A list of each factor's name and values
 }
 \description{
-Title
+This function will be no longer be used.
 }
 \examples{
  #factor_tmp=check_factor_name3(f1name,f2name,f2name,randomname,f1,f2,f3,random)
 }
+\keyword{internal}

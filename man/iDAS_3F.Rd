@@ -82,10 +82,11 @@ A list of hypothesis test outcome, P_mat is the pvalue matrix of all tests,
 S_mat is the statistics matrix of all test, cls_df is the Classification data frame of all tests.
 }
 \description{
-Interpretable differential abundance analysis (three-way analysis)
+This function will be no longer be used.
 }
 \examples{
 #res=iDAS_3F(Z = X,
 #f1 = all.timepoint, f2 = all.pcellstats, f3 = all.pcelltype, random = all.pid, test_func = "lmer",
 #Sig_cutoff = 0.02,Int = 0.01,F1 = 0.01,F2=0.02,F3=0.01,adj_method = "BH")
 }
+\keyword{internal}

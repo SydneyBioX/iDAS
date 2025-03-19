@@ -1,5 +1,6 @@
 #' Interpretable differential abundance analysis (two-way analysis)
 #'
+#' This function will be no longer be used.
 #' @param Z A matrix/dataframe of omics or gene expression data, row as sample.
 #' @param factor1 A vector of the first factor variable.
 #' @param factor2 A vector of the second factor variable.
@@ -19,9 +20,9 @@
 #'
 #' @return A list of hypothesis test outcomes. pval_matrix is the matrix of p-values for all tests,
 #' stat_matrix is the matrix of test statistics, and class_df is the data frame of class results.
-#' @export
 #' @importFrom stats anova formula p.adjust
 #' @importFrom lme4 lmer
+#' @keywords internal
 #' @examples
 #' # res = iDAS_2F(Z = X,
 #' #               factor1 = pcelltype, factor2 = pcell_stats, random_effect = NULL,
@@ -38,7 +39,7 @@ iDAS_2F = function(Z, factor1, factor2, random_effect = NULL,
   pval_matrix = stat_matrix <- matrix(NA, nrow = ncol(Z), ncol = 4)
 
   # Format factor variables and names
-  formatted_factors = check_factor_name(factor1_name, factor2_name, random_effect_name, factor1, factor2, random_effect)
+  formatted_factors = check_factor_name2(factor1_name, factor2_name, random_effect_name, factor1, factor2, random_effect)
 
   # Build model formulas based on the fitting function and random effects
   if(model_fit_function == "lm" & is.null(random_effect)) {
@@ -260,6 +261,7 @@ iDAS_2F = function(Z, factor1, factor2, random_effect = NULL,
 
 #' Check the iDAS_2F input factors' name
 #'
+#' This function will be no longer be used.
 #' @param factor1_name A string for the first factor variable's name.
 #' @param factor2_name A string for the second factor variable's name.
 #' @param random_effect_name A string for the random effect term's name.
@@ -268,10 +270,10 @@ iDAS_2F = function(Z, factor1, factor2, random_effect = NULL,
 #' @param random_effect A vector of the random effect term variables.
 #'
 #' @return A list of each factor's name and values.
-#'
+#' @keywords internal
 #' @examples
 #' # formatted_factors = check_factor_name(factor1_name, factor2_name, random_effect_name, factor1, factor2, random_effect)
-check_factor_name = function(factor1_name, factor2_name, random_effect_name, factor1, factor2, random_effect) {
+check_factor_name2 = function(factor1_name, factor2_name, random_effect_name, factor1, factor2, random_effect) {
   if (is.null(factor1_name)) {
     factor1_name = "factor1"
   }
