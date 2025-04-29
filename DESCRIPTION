@@ -1,8 +1,13 @@
 Package: iDAS
 Title: Interpretable differential abundance analysis
 Version: 0.0.0.9000
-Authors@R: 
-    person("Lijia", "Yu", , "yulj2010@gmail.com", role = c("aut", "cre"))
+Authors@R: c(
+    person("Lijia", "Yu", , "yulj2010@gmail.com", role = c("aut","cre","ctb")),
+    person("Yingxin", "Lin", email = "yingxinlin.res@gmail.com", role = "aut"),
+    person("Xiangnan", "Xu", role = "aut"),
+    person("Pengyi", "Yang", email = "pengyi.yang@sydney.edu.au", role = "aut"),
+    person("Jean", "Yang", email = "jean.yang@sydney.edu.au", role = c("aut")
+    )
 Description: Single-cell technologies have revolutionized our understanding of cellular dynamics by allowing researchers to investigate individual cell responses under various conditions, such as comparing diseased versus healthy states. To better interpret the gene signatures generated in the differential abundance analysis, we developed iDAS to classify the gene signatures into multiple categories.
 License: GPL
 Encoding: UTF-8

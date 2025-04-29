@@ -1,32 +1,8 @@
 ---
-title: "Simulate Pseudobulk and Apply iDAS to find factor associated gene list"
+title: "Simulate Pseudobulk and apply iDAS to find factor associated gene list"
 date: "`r Sys.Date()`"
 author:
 - name: Lijia Yu
-  # affiliation:
-  # - School of Mathematics and Statistics, The University of Sydney, NSW 2006, Australia;
-  # - Sydney Precision Data Science Centre, University of Sydney, NSW 2006, Australia
-  # - Charles Perkins Centre, The University of Sydney, NSW 2006, Australia
-  # - Computational Systems Biology Unit, Children’s Medical Research Institute, Faculty of Medicine and Health, University of Sydney, NSW 2145, Australia
-# - name: Yingxin Lin
-#   affiliation:
-#   - Department of Biostatistics, Yale University, New Haven, CT 208034, USA
-# - name: Xiangnan Xu
-#   affiliation:
-#   - School of Business and Economics, Humboldt-Universität zu Berlin, Berlin 10099, Germany
-# - name: Pengyi Yang
-#   affiliation:
-#   - Computational Systems Biology Unit, Children’s Medical Research Institute, Faculty of Medicine and Health, University of Sydney, NSW 2145, Australia;
-#   - School of Mathematics and Statistics, The University of Sydney, NSW 2006, Australia; 
-#   - Sydney Precision Data Science Centre, University of Sydney, NSW 2006, Australia; 
-#   - Charles Perkins Centre, The University of Sydney, NSW 2006, Australia;
-#   - Laboratory of Data Discovery for Health Limited (D24H), Science Park, Hong Kong SAR, China.
-# - name: Jean Yang
-#   affiliation:
-#   - School of Mathematics and Statistics, The University of Sydney, NSW 2006, Australia; 
-#   - Sydney Precision Data Science Centre, University of Sydney, NSW 2006, Australia; 
-#   - Charles Perkins Centre, The University of Sydney, NSW 2006, Australia;
-#   - Laboratory of Data Discovery for Health Limited (D24H), Science Park, Hong Kong SAR, China.
 output:
   BiocStyle::html_document:
     toc_float: true
