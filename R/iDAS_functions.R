@@ -184,7 +184,7 @@ run_test<- function(data, formula0, formula1, model_fit_function, test_function,
 }
 
 
-#' Two-Factor Differential Analysis
+#' iDAS: Interpretable Differential Analysis of Genes with two Factors
 #'
 #' Conducts a differential analysis for each feature (column) in the data matrix \code{Z} using two experimental factors.
 #' The function employs either a linear model (\code{lm}) or a mixed-effects model (\code{lmer}) depending on the presence
@@ -691,7 +691,7 @@ build_formulas <- function(formatted_factors, test_func, random_effect) {
 
 
 
-#' iDAS: Interpretable Differential Analysis of Genes Using Three Factors
+#' iDAS: Interpretable Differential Analysis of Genes with Three Factors
 #'
 #' This function implements the iDAS (Interpretable Differential Analysis Signature) framework to identify genes
 #' associated with three experimental factors (\code{factor1}, \code{factor2}, and \code{factor3}), as well as
