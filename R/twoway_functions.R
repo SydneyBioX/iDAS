@@ -28,8 +28,10 @@
 #' #               factor1 = pcelltype, factor2 = pcell_stats, random_effect = NULL,
 #' #               model_fit_function = "lm",
 #' #               pval_quantile_cutoff = 0.02, pval_cutoff_full = 0.05,
-#' #               pval_cutoff_interaction = 0.01, pval_cutoff_factor1 = 0.01, pval_cutoff_factor2 = 0.01,
-#' #               p_adjust_method = "BH", factor1_name = NULL, factor2_name = NULL, random_effect_name = NULL)
+#' #               pval_cutoff_interaction = 0.01, pval_cutoff_factor1 = 0.01,
+#' #               pval_cutoff_factor2 = 0.01,
+#' #               p_adjust_method = "BH", factor1_name = NULL, factor2_name = NULL,
+#' #               random_effect_name = NULL)
 iDAS_2F = function(Z, factor1, factor2, random_effect = NULL,
                    model_fit_function = "lm",
                    pval_quantile_cutoff = 0.02, pval_cutoff_full = 0.05,
@@ -272,7 +274,8 @@ iDAS_2F = function(Z, factor1, factor2, random_effect = NULL,
 #' @return A list of each factor's name and values.
 #' @keywords internal
 #' @examples
-#' # formatted_factors = check_factor_name(factor1_name, factor2_name, random_effect_name, factor1, factor2, random_effect)
+#' # formatted_factors = check_factor_name(factor1_name, factor2_name,
+#' # random_effect_name, factor1, factor2, random_effect)
 check_factor_name2 = function(factor1_name, factor2_name, random_effect_name, factor1, factor2, random_effect) {
   if (is.null(factor1_name)) {
     factor1_name = "factor1"

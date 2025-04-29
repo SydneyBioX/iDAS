@@ -63,6 +63,8 @@ anova_test <- function(data, formula0, formula1, model_fit_function) {
 #'   shuffled, while the predictors remain unchanged. This generates a null distribution for the
 #'   F statistic under the hypothesis of no association between the response and the predictors.
 #'
+#' @import BiocParallel
+#'
 #' @examples
 #' \dontrun{
 #' # Example using lm for two nested models
@@ -418,13 +420,15 @@ twofactors <- function(Z, factor1, factor2, random_effect = NULL,
 #' @examples
 #' \dontrun{
 #'   # Example for a fixed effects model:
-#'   formatted_factors <- list(factor1_tmp = "Group", factor2_tmp = "Treatment", factor3_tmp = "Time")
+#'   formatted_factors <- list(factor1_tmp = "Group", factor2_tmp = "Treatment",
+#'   factor3_tmp = "Time")
 #'   formulas <- build_formulas_3F(formatted_factors, test_func = "lm", random_effect = NULL)
 #'   print(formulas$lm_full)
 #'
 #'   # Example for a random effects model:
 #'   formatted_factors$random_effect_tmp <- "Subject"
-#'   formulas_re <- build_formulas_3F(formatted_factors, test_func = "lm", random_effect = formatted_factors$random_effect_tmp)
+#'   formulas_re <- build_formulas_3F(formatted_factors, test_func = "lm",
+#'   random_effect = formatted_factors$random_effect_tmp)
 #'   print(formulas_re$lm_full)
 #' }
 #'
@@ -1055,6 +1059,7 @@ threefactors <- function(Z, factor1, factor2, factor3, random_effect = NULL, mod
 #'
 #' @details The function distinguishes between a two-factor design and a three-factor design based on whether \code{factor3} is provided.
 #' It prints \code{"Running three-factor model"} when executing a three-factor analysis and \code{"Running two-factor model"} for a two-factor analysis (for debugging purposes).
+#' @import BiocParallel
 #'
 #' @examples
 #' \dontrun{
@@ -1062,7 +1067,8 @@ threefactors <- function(Z, factor1, factor2, factor3, random_effect = NULL, mod
 #'   result_two <- iDAS(Z = my_feature_matrix, factor1 = group1, factor2 = group2)
 #'
 #'   # Example using three factors
-#'   result_three <- iDAS(Z = my_feature_matrix, factor1 = group1, factor2 = group2, factor3 = timepoint)
+#'   result_three <- iDAS(Z = my_feature_matrix, factor1 = group1, factor2 = group2,
+#'   factor3 = timepoint)
 #' }
 #'
 #' @export
