@@ -3,6 +3,7 @@
 export(iDAS)
 export(threefactors)
 export(twofactors)
+import(BiocParallel)
 importFrom(lme4,lmer)
 importFrom(stats,anova)
 importFrom(stats,formula)

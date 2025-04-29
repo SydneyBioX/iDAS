@@ -10,6 +10,16 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 biocViews:
 Imports:
-    stats,
-    lme4
+    BiocParallel,
+    lme4,
+    stats
 BugReports: https://github.com/SydneyBioX/iDAS/issues
+Suggests: 
+    aricode,
+    BiocStyle,
+    knitr,
+    MASS,
+    rmarkdown
+VignetteBuilder: knitr
+Depends: R (>= 3.5.0)
+URL: https://sydneybiox.github.io/iDAS/
