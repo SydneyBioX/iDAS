@@ -196,7 +196,7 @@ run_test<- function(data, formula0, formula1, model_fit_function, test_function,
 #' @param model_fit_function A character string specifying the model fitting function to use.
 #'   Acceptable values are \code{"lm"} for linear models or \code{"lmer"} for mixed-effects models.
 #' @param p_adjust_method_for_factors_and_interation Logical indicating whether to apply p-value adjustment
-#'   for follow-up tests on factors and interaction. Defaults to \code{TRUE}.
+#'   for follow-up tests on factors and interaction. Defaults to \code{FALSE}.
 #' @param pval_quantile_cutoff Numeric; a quantile cutoff used for an overall significance filter in the analysis.
 #'   Defaults to \code{0.02}.
 #' @param pval_cutoff_full Numeric; the p-value threshold for the overall model test. Defaults to \code{0.05}.
@@ -233,7 +233,7 @@ run_test<- function(data, formula0, formula1, model_fit_function, test_function,
 #'   factor1 = my_factor1,
 #'   factor2 = my_factor2,
 #'   model_fit_function = "lm",
-#'   p_adjust_method_for_factors_and_interation = TRUE,
+#'   p_adjust_method_for_factors_and_interation = FALSE,
 #'   pval_quantile_cutoff = 0.02,
 #'   pval_cutoff_full = 0.05,
 #'   test_function = "anova_test",
@@ -252,7 +252,7 @@ run_test<- function(data, formula0, formula1, model_fit_function, test_function,
 #'
 #' @export
 twofactors <- function(Z, factor1, factor2, random_effect = NULL,
-                    model_fit_function = "lm",p_adjust_method_for_factors_and_interation=TRUE,
+                    model_fit_function = "lm",p_adjust_method_for_factors_and_interation=FALSE,
                     pval_quantile_cutoff = 0.02, pval_cutoff_full = 0.05,test_function="anova_test",
                     pval_cutoff_interaction = 0.01, pval_cutoff_factor1 = 0.01, pval_cutoff_factor2 = 0.01,
                     p_adjust_method = "BH", factor1_name = NULL, factor2_name = NULL, random_effect_name = NULL,...) {
@@ -1038,7 +1038,7 @@ threefactors <- function(Z, factor1, factor2, factor3, random_effect = NULL, mod
 #' @param factor3 An optional vector or factor representing the third experimental factor. If provided, a three-factor analysis is performed. Default is \code{NULL}.
 #' @param random_effect An optional vector or factor representing a random effect (e.g., subject ID). Default is \code{NULL}.
 #' @param model_fit_function A character string indicating the model fitting function to use (e.g., \code{"lm"} for linear models or \code{"lmer"} for mixed-effects models). Default is \code{"lm"}.
-#' @param p_adjust_method_for_factors_and_interation Logical or character, specifying whether p-values for factors and interactions should be adjusted. Default is \code{TRUE}.
+#' @param p_adjust_method_for_factors_and_interation Logical or character, specifying whether p-values for factors and interactions should be adjusted. Default is \code{FALSE}.
 #' @param pval_quantile_cutoff Numeric value representing the quantile cutoff for overall significance testing. Default is \code{0.02}.
 #' @param pval_cutoff_full Numeric p-value cutoff for the overall (full) model test. Default is \code{0.05}.
 #' @param pval_cutoff_interaction Numeric p-value cutoff for the interaction test. Default is \code{0.01}.
@@ -1068,7 +1068,7 @@ threefactors <- function(Z, factor1, factor2, factor3, random_effect = NULL, mod
 #' @export
 
 iDAS <- function(Z, factor1, factor2,factor3=NULL, random_effect = NULL,
-                 model_fit_function = "lm",p_adjust_method_for_factors_and_interation=TRUE,
+                 model_fit_function = "lm",p_adjust_method_for_factors_and_interation=FALSE,
                  pval_quantile_cutoff = 0.02, pval_cutoff_full = 0.05,
                  pval_cutoff_interaction = 0.01, pval_cutoff_factor1 = 0.01, pval_cutoff_factor2 = 0.01,pval_cutoff_factor3=NULL,
                  p_adjust_method = "BH", factor1_name = NULL, factor2_name = NULL, random_effect_name = NULL,...){
