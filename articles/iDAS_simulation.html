@@ -5,18 +5,24 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Simulate Pseudobulk and Apply iDAS to find factor associated gene list • iDAS</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Simulate Pseudobulk and apply iDAS to find factor associated gene list • iDAS</title>
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Simulate Pseudobulk and Apply iDAS to find factor associated gene list">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Simulate Pseudobulk and apply iDAS to find factor associated gene list">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">iDAS</a>
 
@@ -29,11 +35,12 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="../articles/iDAS.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/iDAS_simulation.html">Simulate Pseudobulk and Apply iDAS to find factor associated gene list</a></li>
+<li><a class="dropdown-item" href="../articles/iDAS_simulation.html">Simulate Pseudobulk and apply iDAS to find factor associated gene list</a></li>
   </ul>
 </li>
       </ul>
@@ -42,6 +49,14 @@
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/SydneyBioX/iDAS/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
+<li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
+  </ul>
+</li>
       </ul>
 </div>
 
@@ -55,7 +70,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Simulate Pseudobulk and Apply iDAS to find factor associated gene list</h1>
+      <h1>Simulate Pseudobulk and apply iDAS to find factor associated gene list</h1>
                         <h4 data-toc-skip class="author">Lijia Yu</h4>
                         
             <h4 data-toc-skip class="date">2025-04-29</h4>
@@ -78,36 +93,23 @@ functions on the simulated data.</p>
 <li>
 <p>Data that meets the ANOVA assumptions:</p>
 <ol style="list-style-type: decimal">
-<li>First, we generated prior parameters for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\mu_0</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>α</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\alpha_0</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\beta_0</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>α</mi><mi>β</mi><mo stretchy="true" form="postfix">)</mo></mrow><mn>0</mn></msub><annotation encoding="application/x-tex">(\alpha\beta)_0</annotation></semantics></math>
+<li>First, we generated prior parameters for <span class="math inline">\(\mu_0\)</span>, <span class="math inline">\(\alpha_0\)</span>, <span class="math inline">\(\beta_0\)</span>, <span class="math inline">\((\alpha\beta)_0\)</span>
 </li>
-<li>We then generated parameters of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\mu_i</annotation></semantics></math>,,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>α</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\alpha_i</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\beta_i</annotation></semantics></math>,<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>α</mi><mi>β</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>i</mi></msub><annotation encoding="application/x-tex">(\alpha\beta)_i</annotation></semantics></math>
-follow normal distribution
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mn>0</mn></msub><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N(\mu_0,1)</annotation></semantics></math>,<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>α</mi><mn>0</mn></msub><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N(\alpha_0,1)</annotation></semantics></math>,<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>β</mi><mn>0</mn></msub><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N(\beta_0,1)</annotation></semantics></math>,<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>α</mi><mi>β</mi><mo stretchy="true" form="postfix">)</mo></mrow><mn>0</mn></msub><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N((\alpha\beta)_0,1)</annotation></semantics></math>
+<li>We then generated parameters of <span class="math inline">\(\mu_i\)</span>,, <span class="math inline">\(\alpha_i\)</span>, <span class="math inline">\(\beta_i\)</span>,<span class="math inline">\((\alpha\beta)_i\)</span> follow normal
+distribution <span class="math inline">\(N(\mu_0,1)\)</span>,<span class="math inline">\(N(\alpha_0,1)\)</span>,<span class="math inline">\(N(\beta_0,1)\)</span>,<span class="math inline">\(N((\alpha\beta)_0,1)\)</span>
 </li>
-<li>Error terms was generated from
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mi>Σ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N(0,\Sigma)</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Σ</mi><annotation encoding="application/x-tex">\Sigma</annotation></semantics></math>
-is the covariance matrix, the diagonal element is 1 and the off-diagonal
-element is ρ, represents the correlation between the genes.</li>
-<li>Generate samples from
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mi>o</mi><mi>d</mi><mi>e</mi><mi>l</mi><mn>1</mn><mo>,</mo><mi>…</mi><mi>M</mi><mi>o</mi><mi>d</mi><mi>e</mi><mi>l</mi><mn>5</mn></mrow><annotation encoding="application/x-tex">Model1,…Model5</annotation></semantics></math>
-based on the steps above.</li>
+<li>Error terms was generated from <span class="math inline">\(N(0,\Sigma)\)</span>, <span class="math inline">\(\Sigma\)</span> is the covariance matrix, the
+diagonal element is 1 and the off-diagonal element is ρ, represents the
+correlation between the genes.</li>
+<li>Generate samples from <span class="math inline">\(Model1,…Model5\)</span> based on the steps
+above.</li>
 </ol>
 </li>
 <li>
 <p>Data with heteroscedastic residuals:</p>
 <ol style="list-style-type: decimal">
-<li>Error terms were generated from a normal distribution, with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Σ</mi><annotation encoding="application/x-tex">\Sigma</annotation></semantics></math>
-based on group variance. For each group, variance values were simulated
-from a uniform distribution.</li>
+<li>Error terms were generated from a normal distribution, with <span class="math inline">\(\Sigma\)</span> based on group variance. For each
+group, variance values were simulated from a uniform distribution.</li>
 </ol>
 </li>
 <li>
@@ -603,7 +605,7 @@ produce results.</p>
 <span><span class="co">#&gt; [22] nloptr_2.2.1        bookdown_0.43       desc_1.4.3         </span></span>
 <span><span class="co">#&gt; [25] minqa_1.2.8         bslib_0.9.0         rlang_1.1.6        </span></span>
 <span><span class="co">#&gt; [28] cachem_1.1.0        xfun_0.52           fs_1.6.6           </span></span>
-<span><span class="co">#&gt; [31] sass_0.4.10         cli_3.6.5           pkgdown_2.1.1      </span></span>
+<span><span class="co">#&gt; [31] sass_0.4.10         cli_3.6.5           pkgdown_2.1.2      </span></span>
 <span><span class="co">#&gt; [34] Rdpack_2.6.4        digest_0.6.37       grid_4.5.0         </span></span>
 <span><span class="co">#&gt; [37] lme4_1.1-37         lifecycle_1.0.4     nlme_3.1-168       </span></span>
 <span><span class="co">#&gt; [40] reformulas_0.4.0    evaluate_1.0.3      codetools_0.2-20   </span></span>
@@ -618,11 +620,11 @@ produce results.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Lijia Yu.</p>
+  <p>Developed by Lijia Yu, Yingxin Lin, Xiangnan Xu, Pengyi Yang, Jean Yang.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer>
