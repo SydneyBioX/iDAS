@@ -6,25 +6,23 @@ Single-cell technologies have revolutionized our understanding of cellular dynam
 
 ## Installation
 
+
 ```{r}
 devtools::install_github("SydneyBioX/iDAS")
 ```
 
 
-
-## Example
-
+## Example command
 
 ```{r}
-  # Example using two factors
-  result_twoway <- iDAS(Z = my_feature_matrix, factor1 = group1, factor2 = group2)
+# Example using two factors
+result_twoway <- iDAS(Z = my_feature_matrix, factor1 = group1, factor2 = group2)
 
-  # Example using three factors
-  result_threeway <- iDAS(Z = my_feature_matrix, factor1 = group1, factor2 = group2, factor3 = timepoint)
+# Example using three factors
+result_threeway <- iDAS(Z = my_feature_matrix, factor1 = group1, factor2 = group2, factor3 = timepoint)
 ```
 
-
-
+### Simulation example
 
 ```{r}
 ## Not run: 
