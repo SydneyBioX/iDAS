@@ -38,13 +38,15 @@ Depending on whether a random effect is provided, the function creates formulas 
 \examples{
 \dontrun{
   # Example for a fixed effects model:
-  formatted_factors <- list(factor1_tmp = "Group", factor2_tmp = "Treatment", factor3_tmp = "Time")
+  formatted_factors <- list(factor1_tmp = "Group", factor2_tmp = "Treatment",
+  factor3_tmp = "Time")
   formulas <- build_formulas_3F(formatted_factors, test_func = "lm", random_effect = NULL)
   print(formulas$lm_full)
 
   # Example for a random effects model:
   formatted_factors$random_effect_tmp <- "Subject"
-  formulas_re <- build_formulas_3F(formatted_factors, test_func = "lm", random_effect = formatted_factors$random_effect_tmp)
+  formulas_re <- build_formulas_3F(formatted_factors, test_func = "lm",
+  random_effect = formatted_factors$random_effect_tmp)
   print(formulas_re$lm_full)
 }
 

@@ -3,10 +3,10 @@ title: "Simulate Pseudobulk and Apply iDAS to find factor associated gene list"
 date: "`r Sys.Date()`"
 author:
 - name: Lijia Yu
-  affiliation:
-  - School of Mathematics and Statistics, The University of Sydney, NSW 2006, Australia;
-  - Sydney Precision Data Science Centre, University of Sydney, NSW 2006, Australia
-  - Charles Perkins Centre, The University of Sydney, NSW 2006, Australia
+  # affiliation:
+  # - School of Mathematics and Statistics, The University of Sydney, NSW 2006, Australia;
+  # - Sydney Precision Data Science Centre, University of Sydney, NSW 2006, Australia
+  # - Charles Perkins Centre, The University of Sydney, NSW 2006, Australia
   # - Computational Systems Biology Unit, Children’s Medical Research Institute, Faculty of Medicine and Health, University of Sydney, NSW 2145, Australia
 # - name: Yingxin Lin
 #   affiliation:
@@ -30,7 +30,15 @@ author:
 output:
   BiocStyle::html_document:
     toc_float: true
-  BiocStyle::pdf_document: default
+    toc_depth: 3
+    theme: united
+    highlight: tango
+    code-fold: false
+    code-tools: true
+    embed-resources: true
+    number_sections: false
+  BiocStyle::pdf_document: 
+    number_sections: false
 package: iDAS
 vignette: |
     %\VignetteIndexEntry{iDAS tutorial: simulation}
@@ -57,7 +65,7 @@ We start with simulate two-factor RNA-seq Pseudobulk and apply iDAS functions on
 
 - Data that meets the ANOVA assumptions:
     1. First, we generated prior parameters for $\mu_0$, $\alpha_0$, $\beta_0$, $(\alpha\beta)_0$
-    2. We then generated parameters of $\mu_i$,, $\alpha_i$, $\beta_i$,$(\alpha\beta)_i$ follow normal distribution $N(\mu_0,1)$,$N(\alpha_0,1)$,$N(\beta_0,1)$,$N((\alpha\beta)_0,1) $
+    2. We then generated parameters of $\mu_i$,, $\alpha_i$, $\beta_i$,$(\alpha\beta)_i$ follow normal distribution $N(\mu_0,1)$,$N(\alpha_0,1)$,$N(\beta_0,1)$,$N((\alpha\beta)_0,1)$
     3. Error terms was generated from $N(0,\Sigma)$, $\Sigma$ is the covariance matrix, the diagonal element is 1 and the off-diagonal element is ρ, represents the correlation between the genes.
     4. Generate samples from $Model1,…Model5$ based on the steps above.
 
@@ -72,101 +80,121 @@ We start with simulate two-factor RNA-seq Pseudobulk and apply iDAS functions on
 #### Functions for simulating Pseudobulk and meta information
 
 ```{r simulation}
-
-generate_sample_metadata <- function(n_samples, cell_type_props, treatment_props) {
+generate_sample_metadata <- function(n_samples,
+                                     cell_type_props,
+                                     treatment_props) {
   # set.seed(42)  # For reproducibility
-  
+
   n_cell_types <- length(cell_type_props)
   n_treatment_levels <- length(treatment_props)
-  
+
   if (sum(cell_type_props) != 1) stop("Cell type proportions must sum to 1.")
   if (sum(treatment_props) != 1) stop("Treatment proportions must sum to 1.")
-  
+
   # Compute number of samples per cell type
   cell_type_sizes <- round(n_samples * cell_type_props)
   cell_type_labels <- rep(1:n_cell_types, times = cell_type_sizes)
-  
+
   # Adjust rounding errors
   diff_samples <- n_samples - sum(cell_type_sizes)
   if (diff_samples != 0) {
-    cell_type_sizes[which.max(cell_type_sizes)] <- cell_type_sizes[which.max(cell_type_sizes)] + diff_samples
+    cell_type_sizes[which.max(cell_type_sizes)] <-
+      cell_type_sizes[which.max(cell_type_sizes)] + diff_samples
   }
-  
+
   # Assign treatment effects based on user-defined proportions
   treatment_labels <- numeric(n_samples)
   sample_index <- 1
-  
+
   for (cell in 1:n_cell_types) {
     n_cell_samples <- cell_type_sizes[cell]
     treatment_sizes <- round(n_cell_samples * treatment_props)
-    
+
     # Adjust rounding errors
     diff_treatment <- n_cell_samples - sum(treatment_sizes)
     if (diff_treatment != 0) {
-      treatment_sizes[which.max(treatment_sizes)] <- treatment_sizes[which.max(treatment_sizes)] + diff_treatment
+      treatment_sizes[which.max(treatment_sizes)] <-
+        treatment_sizes[which.max(treatment_sizes)] + diff_treatment
     }
-    
+
     # Assign treatment labels to this cell type
     treatment_dist <- rep(1:length(treatment_props), times = treatment_sizes)
-    treatment_labels[sample_index:(sample_index + n_cell_samples - 1)] <- sample(treatment_dist)
+    treatment_labels[sample_index:(sample_index + n_cell_samples - 1)] <-
+      sample(treatment_dist)
     sample_index <- sample_index + n_cell_samples
   }
-  
-  return(list(cell_type_labels = cell_type_labels, treatment_labels = treatment_labels))
+
+  return(list(
+    cell_type_labels = cell_type_labels,
+    treatment_labels = treatment_labels
+  ))
 }
 
 
 
-simulate_pseudobulk_rnaseq <- function(n_samples, n_genes, cell_type_labels, treatment_labels, model_type = 1,  SD = 3) {
+simulate_pseudobulk_rnaseq <- function(n_samples, n_genes,
+                                       cell_type_labels, treatment_labels,
+                                       model_type = 1, SD = 3) {
   # set.seed(42)  # Ensure reproducibility
-  
+
   n_cell_types <- length(unique(cell_type_labels))
   n_treatment_levels <- length(unique(treatment_labels))
-  
+
   # **Simulating priors using rnorm()**
   # mu_prior <- rnorm(1, mean = 20, sd = SD)
-  alpha_prior <- c(0, rnorm(n_treatment_levels - 1, mean = 0, sd = SD^2))  # Treatment effects
-  beta_prior <- stats::rnorm(n_cell_types, mean = 0, sd = SD^2)  # Cell type effects
-  gamma_prior <- stats::rnorm(n_treatment_levels * n_cell_types, mean = 0, sd = SD^2)  # Interaction terms
-  
+  # Treatment effects
+  alpha_prior <- c(0, rnorm(n_treatment_levels - 1, mean = 0, sd = SD^2))
+  # Cell type effects
+  beta_prior <- stats::rnorm(n_cell_types, mean = 0, sd = SD^2)
+  # Interaction terms
+  gamma_prior <- stats::rnorm(n_treatment_levels * n_cell_types, mean = 0, sd = SD^2)
+
   # **Simulating each effect using mvrnorm() for correlation structure**
   # mu_effect <-  mvrnorm(1, mu = rep(mu_prior, n_genes), Sigma = diag(n_genes))
-  treatment_effect <- MASS::mvrnorm(1, mu = alpha_prior[treatment_labels], Sigma = diag(n_samples))
-  cell_type_effect <- MASS::mvrnorm(1, mu = beta_prior[cell_type_labels], Sigma = diag(n_samples))
-  interaction_effect <- MASS::mvrnorm(1, mu = gamma_prior[(cell_type_labels - 1) * n_treatment_levels + treatment_labels], Sigma = diag(n_samples))
-  
+  treatment_effect <- MASS::mvrnorm(1,
+    mu = alpha_prior[treatment_labels],
+    Sigma = diag(n_samples)
+  )
+  cell_type_effect <- MASS::mvrnorm(1,
+    mu = beta_prior[cell_type_labels],
+    Sigma = diag(n_samples)
+  )
+  interaction_effect <- MASS::mvrnorm(1,
+    mu = gamma_prior[(cell_type_labels - 1) *
+      n_treatment_levels +
+      treatment_labels],
+    Sigma = diag(n_samples)
+  )
+
   # **Modify Expression Matrix Based on Model Type**
-  if (model_type == 1) {  # Full Model (alpha + beta + gamma)
-    expression_matrix <- #mu_effect +
+  if (model_type == 1) { # Full Model (alpha + beta + gamma)
+    expression_matrix <- # mu_effect +
       matrix(treatment_effect, nrow = n_genes, ncol = n_samples, byrow = TRUE) +
       matrix(cell_type_effect, nrow = n_genes, ncol = n_samples, byrow = TRUE) +
       matrix(interaction_effect, nrow = n_genes, ncol = n_samples, byrow = TRUE) #+
     # error_terms
-  } else if (model_type == 2) {  # Additive Model (alpha + beta)
-    expression_matrix <- #mu_effect +
+  } else if (model_type == 2) { # Additive Model (alpha + beta)
+    expression_matrix <- # mu_effect +
       matrix(treatment_effect, nrow = n_genes, ncol = n_samples, byrow = TRUE) +
       matrix(cell_type_effect, nrow = n_genes, ncol = n_samples, byrow = TRUE) #+
     # error_terms
-  } else if (model_type == 3) {  # Only Treatment Effect (alpha)
-    expression_matrix <-# mu_effect +
+  } else if (model_type == 3) { # Only Treatment Effect (alpha)
+    expression_matrix <- # mu_effect +
       matrix(treatment_effect, nrow = n_genes, ncol = n_samples, byrow = TRUE) #+
     # error_terms
-  } else if (model_type == 4) {  # Only Cell Type Effect (beta)
-    expression_matrix <-# mu_effect +
+  } else if (model_type == 4) { # Only Cell Type Effect (beta)
+    expression_matrix <- # mu_effect +
       matrix(cell_type_effect, nrow = n_genes, ncol = n_samples, byrow = TRUE) #+
     # error_terms
-  } else if (model_type == 5) {  # Null Model (No Effects)
-    expression_matrix <-# mu_effect+
-      matrix(0,nrow=n_genes, ncol=n_samples) # + error_terms
+  } else if (model_type == 5) { # Null Model (No Effects)
+    expression_matrix <- # mu_effect+
+      matrix(0, nrow = n_genes, ncol = n_samples) # + error_terms
   } else {
     stop("Invalid model selection. Choose 1, 2, 3, 4, or 5.")
   }
-  
+
   return(expression_matrix)
 }
-
-
-
 ```
 
 
@@ -175,64 +203,81 @@ simulate_pseudobulk_rnaseq <- function(n_samples, n_genes, cell_type_labels, tre
 We not only simulate the ideal situation but also simulate situations where the assumptions of parametric-based tests may not hold, such as heteroscedastic residuals and non-normal residuals.
 
 ```{r residuals}
-
-generate_heteroscedastic_residuals <- function(n_samples, n_genes, cell_type_labels, treatment_labels, min_sd = 1, max_sd = 5) {
+generate_heteroscedastic_residuals <- function(n_samples, n_genes,
+                                               cell_type_labels,
+                                               treatment_labels,
+                                               min_sd = 1, max_sd = 5) {
   # set.seed(42)  # Ensure reproducibility
-  
-  # Create unique group labels (T1_C1, T2_C2, etc.)
-  group_labels <- paste0("T", treatment_labels, "_C", cell_type_labels)  
-  unique_groups <- unique(group_labels)  
-  
-  # Assign different standard deviations per group
-  group_variances <- stats::runif(length(unique_groups), min = min_sd, max = max_sd)  
-  names(group_variances) <- unique_groups  
-  
-  # Generate heteroscedastic residuals
-  error_terms <- matrix(0, nrow = n_genes, ncol = n_samples)
-  
-  for (i in 1:n_samples) {
-    group <- group_labels[i]
-    sigma <- group_variances[group]  # Get group-specific standard deviation
-    error_terms[, i] <- stats::rnorm(n_genes, mean = 0, sd = sigma)  # Sample residuals
-  }
-  
-  return(error_terms)
-}
 
-generate_nonnormal_residuals <- function(n_samples, n_genes, cell_type_labels, treatment_labels, dist_type = "gamma") {
-  # set.seed(42)  # Ensure reproducibility
-  
   # Create unique group labels (T1_C1, T2_C2, etc.)
   group_labels <- paste0("T", treatment_labels, "_C", cell_type_labels)
   unique_groups <- unique(group_labels)
-  
+
   # Assign different standard deviations per group
-  group_variances <- stats::runif(length(unique_groups), min = 0, max = 1.5)
+  group_variances <- stats::runif(length(unique_groups),
+    min = min_sd, max = max_sd
+  )
   names(group_variances) <- unique_groups
-  
-  # Generate non-normal residuals
+
+  # Generate heteroscedastic residuals
   error_terms <- matrix(0, nrow = n_genes, ncol = n_samples)
-  
+
   for (i in 1:n_samples) {
     group <- group_labels[i]
-    sigma <- group_variances[group]  # Get group-specific standard deviation
-    
-    # Generate residuals based on the specified distribution
-    if (dist_type == "gamma") {
-      temp= stats::rgamma(n_genes, shape = 0.5, scale = sigma) #-2 * sigma 
-      error_terms[, i] <- temp - mean (temp)  # Right-skewed
-    } else if (dist_type == "lognormal") {
-      error_terms[, i] <- stats::rlnorm(n_genes, meanlog = log(sigma), sdlog = 0.5) - sigma  # Long-tailed
-    } else if (dist_type == "laplace") {
-      error_terms[, i] <- stats::rnorm(n_genes, mean = 0, sd = sigma) * sign(runif(n_genes) - 0.5)  # Heavy-tailed
-    } else {
-      stop("Invalid distribution type. Choose 'gamma', 'lognormal', or 'laplace'.")
-    }
+    sigma <- group_variances[group] # Get group-specific standard deviation
+    # Sample residuals
+    error_terms[, i] <- stats::rnorm(n_genes, mean = 0, sd = sigma)
   }
-  
+
   return(error_terms)
 }
 
+generate_nonnormal_residuals <- function(n_samples,
+                                         n_genes,
+                                         cell_type_labels,
+                                         treatment_labels,
+                                         dist_type = "gamma") {
+  # set.seed(42)  # Ensure reproducibility
+
+  # Create unique group labels (T1_C1, T2_C2, etc.)
+  group_labels <- paste0("T", treatment_labels, "_C", cell_type_labels)
+  unique_groups <- unique(group_labels)
+
+  # Assign different standard deviations per group
+  group_variances <- stats::runif(length(unique_groups), min = 0, max = 1.5)
+  names(group_variances) <- unique_groups
+
+  # Generate non-normal residuals
+  error_terms <- matrix(0, nrow = n_genes, ncol = n_samples)
+
+  for (i in 1:n_samples) {
+    group <- group_labels[i]
+    sigma <- group_variances[group] # Get group-specific standard deviation
+
+    # Generate residuals based on the specified distribution
+    if (dist_type == "gamma") {
+      temp <- stats::rgamma(n_genes, shape = 0.5, scale = sigma) #-2 * sigma
+      error_terms[, i] <- temp - mean(temp) # Right-skewed
+    } else if (dist_type == "lognormal") {
+      # Long-tailed
+      error_terms[, i] <- stats::rlnorm(n_genes,
+        meanlog = log(sigma),
+        sdlog = 0.5
+      ) - sigma
+    } else if (dist_type == "laplace") {
+      # Heavy-tailed
+      error_terms[, i] <- stats::rnorm(n_genes,
+        mean = 0,
+        sd = sigma
+      ) * sign(runif(n_genes) - 0.5)
+    } else {
+      stop("Invalid distribution type. Choose 'gamma',
+           'lognormal', or 'laplace'.")
+    }
+  }
+
+  return(error_terms)
+}
 ```
 
 
@@ -243,35 +288,35 @@ generate_nonnormal_residuals <- function(n_samples, n_genes, cell_type_labels, t
 We want to simulate 60 patient samples. There are two cell types within these samples (cell type 1 and cell type 2) and two treatment phenotypes. The pseudobulk data is generated at the cell type level, where each sample represents a cell type with its treatment phenotype (either responding or non-responding to the therapy).
 
 ```{r parameters}
-n_samples <- 60  # Total number of samples
-n_genes_list <- c(50, 50, 50, 50, 50)  # Number of genes per model type
-names(n_genes_list)=c("Interaction","Additive","Treatment","Celltype","Null")
-cell_type_props <- c(0.5, 0.5)  # 50% cell type 1, 50% cell type 2
-treatment_props <- c(0.5, 0.5)  # 50% Treatment 1, 50% Treatment 2
+n_samples <- 60 # Total number of samples
+n_genes_list <- c(50, 50, 50, 50, 50) # Number of genes per model type
+names(n_genes_list) <- c("Interaction", "Additive", "Treatment", "Celltype", "Null")
+cell_type_props <- c(0.5, 0.5) # 50% cell type 1, 50% cell type 2
+treatment_props <- c(0.5, 0.5) # 50% Treatment 1, 50% Treatment 2
 
 metadata <- generate_sample_metadata(n_samples, cell_type_props, treatment_props)
 
-table(metadata$cell_type_labels,metadata$treatment_labels)
+table(metadata$cell_type_labels, metadata$treatment_labels)
 ```
 
-1.Simulate expression data for each model (Models 1 to 5)
+##### 1.Simulate expression data for each model (Models 1 to 5)
 
 ```{r simulation_step1}
-
 expr_list <- lapply(1:5, function(i) {
   simulate_pseudobulk_rnaseq(n_samples,
-                             n_genes_list[i],
-                             metadata$cell_type_labels,
-                             metadata$treatment_labels,
-                             model_type = i)
+    n_genes_list[i],
+    metadata$cell_type_labels,
+    metadata$treatment_labels,
+    model_type = i
+  )
 })
-  
+
 # Combine the simulated expression matrices by row
 expr_combined <- do.call(rbind, expr_list)
 total_genes <- sum(n_genes_list)
 ```
 
-2.Generate error/residual matrices
+##### 2.Generate error/residual matrices
 
 ```{r simulation_step2}
 rho <- 0
@@ -279,16 +324,18 @@ Sigma <- (1 - rho) * diag(total_genes) + rho * matrix(1, nrow = total_genes, nco
 
 error_terms <- t(MASS::mvrnorm(n_samples, mu = rep(0, total_genes), Sigma = Sigma))
 error_terms_het <- generate_heteroscedastic_residuals(n_samples, total_genes,
-                                                      metadata$cell_type_labels,
-                                                      metadata$treatment_labels,
-                                                      min_sd = 1, max_sd =  sqrt(10))
+  metadata$cell_type_labels,
+  metadata$treatment_labels,
+  min_sd = 1, max_sd = sqrt(10)
+)
 error_terms_nonnormal <- generate_nonnormal_residuals(n_samples, total_genes,
-                                                      metadata$cell_type_labels,
-                                                      metadata$treatment_labels,
-                                                      dist_type = "gamma")
+  metadata$cell_type_labels,
+  metadata$treatment_labels,
+  dist_type = "gamma"
+)
 ```
 
-3.Create three expression matrices by adding different error terms
+##### 3.Create three expression matrices by adding different error terms
 
 `expr_combined_null` represents the ideal simulation, where the data has two factor effects and normal residuals.
 
@@ -298,47 +345,50 @@ error_terms_nonnormal <- generate_nonnormal_residuals(n_samples, total_genes,
 
 
 ```{r simulation_step3}
-expr_combined_null      <- expr_combined + error_terms
-expr_combined_het       <- expr_combined + error_terms_het
+expr_combined_null <- expr_combined + error_terms
+expr_combined_het <- expr_combined + error_terms_het
 expr_combined_nonnormal <- expr_combined + error_terms_nonnormal
 ```
 
 
-4.Generate gene names 
+##### 4.Generate gene names 
 
 True labels are embedded as the first part, e.g., "Model1".
 
 ```{r simulation_step4}
-gene_names_combined <- unlist(lapply(1:5, function(i){
-  offset <- if(i == 1) 0 else sum(n_genes_list[1:(i-1)])
+gene_names_combined <- unlist(lapply(1:5, function(i) {
+  offset <- if (i == 1) 0 else sum(n_genes_list[1:(i - 1)])
   paste0("Model", i, "_Gene", seq_len(n_genes_list[i]) + offset)
 }))
 ```
 
-5. Generate sample names from metadata
+##### 5.Generate sample names from metadata
 
 ```{r simulation_step5}
-
-sample_names <- paste0("Sample", 1:n_samples, "_T", metadata$treatment_labels, "_C", metadata$cell_type_labels)
+sample_names <- paste0("Sample", 1:n_samples, "_T", 
+                       metadata$treatment_labels, "_C", 
+                       metadata$cell_type_labels)
 
 # Assign row and column names to all three matrices
-rownames(expr_combined_null)      <- gene_names_combined
-rownames(expr_combined_het)       <- gene_names_combined
+rownames(expr_combined_null) <- gene_names_combined
+rownames(expr_combined_het) <- gene_names_combined
 rownames(expr_combined_nonnormal) <- gene_names_combined
 
-colnames(expr_combined_null)      <- sample_names
-colnames(expr_combined_het)       <- sample_names
+colnames(expr_combined_null) <- sample_names
+colnames(expr_combined_het) <- sample_names
 colnames(expr_combined_nonnormal) <- sample_names
 ```
 
-6. Create sample annotation (same for all simulations)
+##### 6.Create sample annotation (same for all simulations)
 
 ```{r simulation_step6}
 sample_annotation <- data.frame(
   Treatment = factor(metadata$treatment_labels,
-                     labels = paste0("T", 1:length(unique(metadata$treatment_labels)))),
+    labels = paste0("T", 1:length(unique(metadata$treatment_labels)))
+  ),
   Cell_Type = factor(metadata$cell_type_labels,
-                     labels = paste0("C", 1:length(unique(metadata$cell_type_labels))))
+    labels = paste0("C", 1:length(unique(metadata$cell_type_labels)))
+  )
 )
 rownames(sample_annotation) <- sample_names
 ```
@@ -346,18 +396,18 @@ rownames(sample_annotation) <- sample_names
 
 ### Run iDAS analysis
 
-
 Please note that permutation tests may take a very long time to produce results.
 
 ```{r iDAS}
-
-oc_null <- iDAS::iDAS(Z = data.frame(t(expr_combined_null), check.names = FALSE),
-                     factor1= sample_annotation$Cell_Type,
-                     factor2= sample_annotation$Treatment,
-                     model_fit_function = "lm",pval_quantile_cutoff=NULL,
-                     pval_cutoff_full = 0.05, pval_cutoff_interaction = 0.05,
-                     pval_cutoff_factor1 = 0.05, pval_cutoff_factor2 = 0.05,
-                     p_adjust_method = "BH")
+oc_null <- iDAS::iDAS(
+  Z = data.frame(t(expr_combined_null), check.names = FALSE),
+  factor1 = sample_annotation$Cell_Type,
+  factor2 = sample_annotation$Treatment,
+  model_fit_function = "lm", pval_quantile_cutoff = NULL,
+  pval_cutoff_full = 0.05, pval_cutoff_interaction = 0.05,
+  pval_cutoff_factor1 = 0.05, pval_cutoff_factor2 = 0.05,
+  p_adjust_method = "BH"
+)
 
 # oc_null_permu=iDAS::iDAS(Z = data.frame(t(expr_combined_null), check.names = FALSE),
 #                      factor1= sample_annotation$Cell_Type,
@@ -369,13 +419,15 @@ oc_null <- iDAS::iDAS(Z = data.frame(t(expr_combined_null), check.names = FALSE)
 #                      n_perm = 100,BPPARAM = SerialParam())
 
 
-oc_het <- iDAS::iDAS(Z = data.frame(t(expr_combined_het), check.names = FALSE),
-                     factor1= sample_annotation$Cell_Type,
-                     factor2= sample_annotation$Treatment,
-                     model_fit_function = "lm",
-                     pval_cutoff_full = 0.05, pval_cutoff_interaction = 0.05,
-                     pval_cutoff_factor1 = 0.05, pval_cutoff_factor2 = 0.05,
-                     p_adjust_method = "BH")
+oc_het <- iDAS::iDAS(
+  Z = data.frame(t(expr_combined_het), check.names = FALSE),
+  factor1 = sample_annotation$Cell_Type,
+  factor2 = sample_annotation$Treatment,
+  model_fit_function = "lm",
+  pval_cutoff_full = 0.05, pval_cutoff_interaction = 0.05,
+  pval_cutoff_factor1 = 0.05, pval_cutoff_factor2 = 0.05,
+  p_adjust_method = "BH"
+)
 
 # oc_het_permu=iDAS::iDAS(Z = data.frame(t(expr_combined_het),check.names = FALSE),
 #                      factor1= sample_annotation$Cell_Type,
@@ -386,13 +438,15 @@ oc_het <- iDAS::iDAS(Z = data.frame(t(expr_combined_het), check.names = FALSE),
 #                      p_adjust_method = "BH",test_function = "perm_anova_test",
 #                      n_perm = 100,BPPARAM = MulticoreParam(10))
 
-oc_nonnormal <- iDAS::iDAS(Z = data.frame(t(expr_combined_nonnormal), check.names = FALSE),
-                     factor1= sample_annotation$Cell_Type,
-                     factor2= sample_annotation$Treatment,
-                     model_fit_function = "lm",
-                     pval_cutoff_full = 0.05, pval_cutoff_interaction = 0.05,
-                     pval_cutoff_factor1 = 0.05, pval_cutoff_factor2 = 0.05,
-                     p_adjust_method = "BH")
+oc_nonnormal <- iDAS::iDAS(
+  Z = data.frame(t(expr_combined_nonnormal), check.names = FALSE),
+  factor1 = sample_annotation$Cell_Type,
+  factor2 = sample_annotation$Treatment,
+  model_fit_function = "lm",
+  pval_cutoff_full = 0.05, pval_cutoff_interaction = 0.05,
+  pval_cutoff_factor1 = 0.05, pval_cutoff_factor2 = 0.05,
+  p_adjust_method = "BH"
+)
 
 # oc_nonnormal_permu=iDAS::iDAS(Z = data.frame(t(expr_combined_nonnormal),check.names = FALSE),
 #                      factor1= sample_annotation$Cell_Type,
@@ -402,8 +456,6 @@ oc_nonnormal <- iDAS::iDAS(Z = data.frame(t(expr_combined_nonnormal), check.name
 #                      pval_cutoff_factor1 = 0.05, pval_cutoff_factor2 = 0.05,
 #                      p_adjust_method = "BH",test_function = "perm_anova_test",
 #                      n_perm = 100,BPPARAM = MulticoreParam(10))
-
-
 ```
 
 #### Compare Parametric-based and Permuation-based test results
@@ -424,17 +476,17 @@ clusterres_nonnormal$Sig1[is.na(clusterres_nonnormal$Sig1)] <- "non-sig"
 
 # clusterres_het_permu <- data.frame(oc_het_permu$class_df)
 # clusterres_het_permu$Sig1[is.na(clusterres_het_permu$Sig1)] <- "non-sig"
-# 
+#
 # clusterres_nonnormal_permu <- data.frame(oc_nonnormal_permu$class_df)
 # clusterres_nonnormal_permu$Sig1[is.na(clusterres_nonnormal_permu$Sig1)] <- "non-sig"
 
 
 # Extract the true labels from gene names (e.g., "Model1" from "Model1_GeneX")
-true_labels <- do.call(rbind, strsplit(clusterres_null$varname, "_"))[,1]
+true_labels <- do.call(rbind, strsplit(clusterres_null$varname, "_"))[, 1]
 
 # Compute ARI between true labels and predicted labels
-ari_true_null      <- aricode::ARI(true_labels, clusterres_null$Sig1)
-ari_true_het       <- aricode::ARI(true_labels, clusterres_het$Sig1)
+ari_true_null <- aricode::ARI(true_labels, clusterres_null$Sig1)
+ari_true_het <- aricode::ARI(true_labels, clusterres_het$Sig1)
 ari_true_nonnormal <- aricode::ARI(true_labels, clusterres_nonnormal$Sig1)
 
 
@@ -444,11 +496,19 @@ ari_true_nonnormal <- aricode::ARI(true_labels, clusterres_nonnormal$Sig1)
 # ari_true_nonnormal_permu <- ARI(true_labels, clusterres_nonnormal_permu$Sig1)
 
 
-print(paste0("concordance result from parametric-based test: ",ari_true_null))
+print(paste0("ARI of parametric-based test: ", ari_true_null))
 # print(paste0("concordance result from permutation test: ",ari_true_null_permu))
 
 
-print(paste0("concordance result from parametric-based test, the assumption of homoscedastic residuals does not hold. : ",ari_true_het))
-print(paste0("concordance result from parametric-based test, the assumption of normal residuals does not hold.
-: ",ari_true_nonnormal))
+print("ARI of parametric-based test with heterscedastic residuals: ")
+print(ari_true_het)
+print("ARI of parametric-based test with non-normal residuals does not hold.: ")
+print(ari_true_nonnormal)
 ```
+
+### Session Information
+
+```{r}
+sessionInfo()
+```
+

@@ -33,6 +33,7 @@ A list of each factor's name and values.
 This function will be no longer be used.
 }
 \examples{
-# formatted_factors = check_factor_name(factor1_name, factor2_name, random_effect_name, factor1, factor2, random_effect)
+# formatted_factors = check_factor_name(factor1_name, factor2_name,
+# random_effect_name, factor1, factor2, random_effect)
 }
 \keyword{internal}

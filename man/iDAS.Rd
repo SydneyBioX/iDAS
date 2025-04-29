@@ -11,7 +11,7 @@ iDAS(
   factor3 = NULL,
   random_effect = NULL,
   model_fit_function = "lm",
-  p_adjust_method_for_factors_and_interation = TRUE,
+  p_adjust_method_for_factors_and_interation = FALSE,
   pval_quantile_cutoff = 0.02,
   pval_cutoff_full = 0.05,
   pval_cutoff_interaction = 0.01,
@@ -38,7 +38,7 @@ iDAS(
 
 \item{model_fit_function}{A character string indicating the model fitting function to use (e.g., \code{"lm"} for linear models or \code{"lmer"} for mixed-effects models). Default is \code{"lm"}.}
 
-\item{p_adjust_method_for_factors_and_interation}{Logical or character, specifying whether p-values for factors and interactions should be adjusted. Default is \code{TRUE}.}
+\item{p_adjust_method_for_factors_and_interation}{Logical or character, specifying whether p-values for factors and interactions should be adjusted. Default is \code{FALSE}.}
 
 \item{pval_quantile_cutoff}{Numeric value representing the quantile cutoff for overall significance testing. Default is \code{0.02}.}
 
@@ -80,7 +80,8 @@ It prints \code{"Running three-factor model"} when executing a three-factor anal
   result_two <- iDAS(Z = my_feature_matrix, factor1 = group1, factor2 = group2)
 
   # Example using three factors
-  result_three <- iDAS(Z = my_feature_matrix, factor1 = group1, factor2 = group2, factor3 = timepoint)
+  result_three <- iDAS(Z = my_feature_matrix, factor1 = group1, factor2 = group2,
+  factor3 = timepoint)
 }
 
 }

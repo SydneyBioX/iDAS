@@ -10,7 +10,7 @@ twofactors(
   factor2,
   random_effect = NULL,
   model_fit_function = "lm",
-  p_adjust_method_for_factors_and_interation = TRUE,
+  p_adjust_method_for_factors_and_interation = FALSE,
   pval_quantile_cutoff = 0.02,
   pval_cutoff_full = 0.05,
   test_function = "anova_test",
@@ -38,7 +38,7 @@ Use \code{NULL} if not applicable.}
 Acceptable values are \code{"lm"} for linear models or \code{"lmer"} for mixed-effects models.}
 
 \item{p_adjust_method_for_factors_and_interation}{Logical indicating whether to apply p-value adjustment
-for follow-up tests on factors and interaction. Defaults to \code{TRUE}.}
+for follow-up tests on factors and interaction. Defaults to \code{FALSE}.}
 
 \item{pval_quantile_cutoff}{Numeric; a quantile cutoff used for an overall significance filter in the analysis.
 Defaults to \code{0.02}.}
@@ -92,7 +92,7 @@ results <- twofactors(
   factor1 = my_factor1,
   factor2 = my_factor2,
   model_fit_function = "lm",
-  p_adjust_method_for_factors_and_interation = TRUE,
+  p_adjust_method_for_factors_and_interation = FALSE,
   pval_quantile_cutoff = 0.02,
   pval_cutoff_full = 0.05,
   test_function = "anova_test",
