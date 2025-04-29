@@ -3,7 +3,7 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   iDAS_simulation: iDAS_simulation.html
-last_built: 2025-04-29T08:02Z
+last_built: 2025-04-29T08:13Z
 urls:
   reference: https://sydneybiox.github.io/iDAS/reference
   article: https://sydneybiox.github.io/iDAS/articles
