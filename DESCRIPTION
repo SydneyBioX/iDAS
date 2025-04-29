@@ -6,7 +6,7 @@ Authors@R: c(
     person("Yingxin", "Lin", email = "yingxinlin.res@gmail.com", role = "aut"),
     person("Xiangnan", "Xu", role = "aut"),
     person("Pengyi", "Yang", email = "pengyi.yang@sydney.edu.au", role = "aut"),
-    person("Jean", "Yang", email = "jean.yang@sydney.edu.au", role = c("aut")
+    person("Jean", "Yang", email = "jean.yang@sydney.edu.au", role = "aut")
     )
 Description: Single-cell technologies have revolutionized our understanding of cellular dynamics by allowing researchers to investigate individual cell responses under various conditions, such as comparing diseased versus healthy states. To better interpret the gene signatures generated in the differential abundance analysis, we developed iDAS to classify the gene signatures into multiple categories.
 License: GPL
