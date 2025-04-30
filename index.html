@@ -74,7 +74,8 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p><code>{r} devtools::install_github("SydneyBioX/iDAS")</code></p>
+<p>The iDAS package is still under development to meet Bioconductor standards. If you have any questions, please don’t hesitate to open an issue.</p>
+<p><code>{r} ## install from github devtools::install_github("SydneyBioX/iDAS")</code></p>
 </div>
 <div class="section level2">
 <h2 id="example-command">Example command<a class="anchor" aria-label="anchor" href="#example-command"></a>
@@ -89,9 +90,9 @@
 <pre><code>
 ### Simulation example
 
+Here, we provide some simple simulation example to show how to use iDAS function.
+
 ```{r}
-## Not run:
-# Generate sample data
 set.seed(123)
 Z &lt;- matrix(rnorm(1000), ncol = 10)
 colnames(Z)=paste0("gene",1:10)
@@ -116,14 +117,9 @@ result &lt;- threefactors(
   pval_cutoff_int123 = 0.01,
   p_adjust_method = "BH"
 )
-
-# Inspect results
-head(result$pval_matrix)
-head(result$stat_matrix)
-head(result$class_df)
-
-## End(Not run)</code></pre>
-<p>The iDAS package is still under development to meet Bioconductor standards. If you have any questions, please don’t hesitate to open an issue.</p>
+</code></pre>
+<p>Results include three table, the p-value (or adjusted p-value) table, F-statistics table, and the gene associated groups.</p>
+<p><code>{r} # Inspect results head(result$pval_matrix) head(result$stat_matrix) head(result$class_df)</code></p>
 </div>
 
   </main><aside class="col-md-3"><div class="links">
