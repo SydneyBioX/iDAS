@@ -86,6 +86,18 @@
 </h2>
 <p>We start with simulate two-factor RNA-seq Pseudobulk and apply iDAS
 functions on the simulated data.</p>
+<p>Our models are:</p>
+<p>Model1: <span class="math display">\[y_{ijm}=\mu+\alpha_i+\beta_j+(\alpha\beta)_{ij}+\epsilon_{ijm}\]</span></p>
+<p>Model2: <span class="math display">\[y_{ijm}=\mu+\alpha_i+\beta_j+\epsilon_{ijm}\]</span></p>
+<p>Model3: <span class="math display">\[y_{ijm}=\mu+\alpha_i+\epsilon_{ijm}\]</span></p>
+<p>Model4: <span class="math display">\[y_{ijm}=\mu+\beta_j+\epsilon_{ijm}\]</span></p>
+<p>Model5: <span class="math display">\[y_{ijm}=\mu+\epsilon_{ijm}\]</span></p>
+<p>Where <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> are two factors, and <span class="math inline">\((\alpha\beta)_{ij}\)</span> represents the
+interaction effect,which I will denote as <span class="math inline">\(\gamma\)</span> in my simulation code.</p>
+<p>Thus, my task is to simulate different groups of genes using Models
+1, 2, 3, 4, and 5.</p>
+<p>And also modify the <span class="math inline">\(\epsilon_{ijm}\)</span> term to match the three
+conditions.</p>
 <div class="section level3">
 <h3 id="simulation-strategy">Simulation strategy<a class="anchor" aria-label="anchor" href="#simulation-strategy"></a>
 </h3>
@@ -528,7 +540,7 @@ produce results.</p>
 <span></span>
 <span><span class="co"># clusterres_null_permu &lt;- data.frame(oc_null_permu$class_df)</span></span>
 <span><span class="co"># clusterres_null_permu$Sig1[is.na(clusterres_null_permu$Sig1)] &lt;- "non-sig"</span></span>
-<span></span>
+<span>  </span>
 <span><span class="co"># clusterres_het_permu &lt;- data.frame(oc_het_permu$class_df)</span></span>
 <span><span class="co"># clusterres_het_permu$Sig1[is.na(clusterres_het_permu$Sig1)] &lt;- "non-sig"</span></span>
 <span><span class="co">#</span></span>
@@ -564,12 +576,8 @@ produce results.</p>
 <span><span class="co">#&gt; [1] "ARI of parametric-based test with non-normal residuals does not hold.: "</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ari_true_nonnormal</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.001839015</span></span></code></pre></div>
-</div>
-</div>
-<div class="section level3">
-<h3 id="session-information">Session Information<a class="anchor" aria-label="anchor" href="#session-information"></a>
-</h3>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<details><summary><strong>Session Information</strong>
+</summary><div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R version 4.5.0 (2025-04-11)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
@@ -611,6 +619,8 @@ produce results.</p>
 <span><span class="co">#&gt; [40] reformulas_0.4.0    evaluate_1.0.3      codetools_0.2-20   </span></span>
 <span><span class="co">#&gt; [43] ragg_1.4.0          rmarkdown_2.29      tools_4.5.0        </span></span>
 <span><span class="co">#&gt; [46] htmltools_0.5.8.1</span></span></code></pre></div>
+</details>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
