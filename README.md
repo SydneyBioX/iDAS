@@ -8,7 +8,6 @@ Single-cell technologies have revolutionized our understanding of cellular dynam
 ![idas_workflow](./man/figures/idas_workflow.png)
 
 
-
 ## Installation
 
 The iDAS package is still under development to meet Bioconductor standards. If you have any questions, please don't hesitate to open an issue.
@@ -46,10 +45,10 @@ factor2 <- as.factor(rep(1:2, times = 5))
 factor3 <- as.factor(rep(1:2, length.out = 10))
 
 # Run the differential analysis using iDAS
-result <- threefactors(
+result <- iDAS(
   Z, factor1, factor2, factor3,
   model_fit_function = "lm",
-  test_function = "anova_test",
+  test_function = "parametric",
   pval_quantile_cutoff = 0.02,
   pval_cutoff_full = 0.05,
   pval_cutoff_interaction = 0.01,
@@ -66,6 +65,8 @@ result <- threefactors(
 ```
 
 Results include three table, the p-value (or adjusted p-value) table, F-statistics table, and the gene associated groups.
+
+The `Sig0` column represents the test result from the full model. `Intornotint` indicates whether a significant interaction effect is present. `F1`, `F2`, and `F3` represent tests for gene associations with the main effects of Factor 1, Factor 2, and Factor 3, respectively. `Twowaysorthreeways` distinguishes whether the interaction effect is a two-way or three-way interaction. `F1F2`, `F2F3`, and `F1F3` correspond to the three types of two-way interaction effects.
 
 ```
 # Inspect results

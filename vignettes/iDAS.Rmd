@@ -56,17 +56,15 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(iDAS)
 
-demo <- readRDS(system.file("extdata", "melanoma_example.rds", package = "iDAS"))
-```
+## Introduction
 
-just a test, haven't finished.
 
 
 
 ```{r}
+library(iDAS)
+
 set.seed(123)
 Z <- matrix(rnorm(1000), ncol = 10)
 colnames(Z)=paste0("gene",1:10)
@@ -75,10 +73,10 @@ factor2 <- as.factor(rep(1:2, times = 5))
 factor3 <- as.factor(rep(1:2, length.out = 10))
 
 # Run the differential analysis using iDAS
-result <- threefactors(
+result <- iDAS(
   Z, factor1, factor2, factor3,
   model_fit_function = "lm",
-  test_function = "anova_test",
+  test_function = "parametric",
   pval_quantile_cutoff = 0.02,
   pval_cutoff_full = 0.05,
   pval_cutoff_interaction = 0.01,
@@ -88,8 +86,7 @@ result <- threefactors(
   pval_cutoff_int12 = 0.01,
   pval_cutoff_int13 = 0.01,
   pval_cutoff_int23 = 0.01,
-  pval_cutoff_int123 = 0.01,
-  p_adjust_method = "BH"
+  pval_cutoff_int123 = 0.01
 )
 
 # Inspect results
@@ -98,3 +95,15 @@ head(result$stat_matrix)
 head(result$class_df)
 
 ```
+
+
+
+## Demo example
+
+```{r setup}
+
+
+demo <- readRDS(system.file("extdata", "melanoma_example.rds", package = "iDAS"))
+```
+
+just a test, haven't finished.
