@@ -17,7 +17,7 @@ output:
     number_sections: false
 package: iDAS
 vignette: |
-    %\VignetteIndexEntry{iDAS tutorial: simulation}
+    %\VignetteIndexEntry{Simulate Pseudobulk and apply iDAS to find factor associated gene list}
     %\VignetteEncoding{UTF-8}
     %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -35,6 +35,29 @@ knitr::opts_chunk$set(
 ## Summary
 
 We start with simulate two-factor RNA-seq Pseudobulk and apply iDAS functions on the simulated data.
+
+
+
+Our models are:
+
+
+Model1: $$y_{ijm}=\mu+\alpha_i+\beta_j+(\alpha\beta)_{ij}+\epsilon_{ijm}$$
+
+Model2: $$y_{ijm}=\mu+\alpha_i+\beta_j+\epsilon_{ijm}$$
+
+Model3: $$y_{ijm}=\mu+\alpha_i+\epsilon_{ijm}$$
+
+Model4: $$y_{ijm}=\mu+\beta_j+\epsilon_{ijm}$$
+
+Model5: $$y_{ijm}=\mu+\epsilon_{ijm}$$
+
+
+Where $\alpha$ and $\beta$ are two factors, and $(\alpha\beta)_{ij}$ represents the interaction effect,which I will denote as $\gamma$ in my simulation code.
+
+Thus, my task is to simulate different groups of genes using Models 1, 2, 3, 4, and 5.
+ 
+And also modify the $\epsilon_{ijm}$ term to match the three conditions.
+
 
 ### Simulation strategy
 
@@ -449,7 +472,7 @@ clusterres_nonnormal$Sig1[is.na(clusterres_nonnormal$Sig1)] <- "non-sig"
 
 # clusterres_null_permu <- data.frame(oc_null_permu$class_df)
 # clusterres_null_permu$Sig1[is.na(clusterres_null_permu$Sig1)] <- "non-sig"
-
+  
 # clusterres_het_permu <- data.frame(oc_het_permu$class_df)
 # clusterres_het_permu$Sig1[is.na(clusterres_het_permu$Sig1)] <- "non-sig"
 #
@@ -482,9 +505,15 @@ print("ARI of parametric-based test with non-normal residuals does not hold.: ")
 print(ari_true_nonnormal)
 ```
 
-### Session Information
+
+
+<details>
+
+<summary>**Session Information**</summary>
 
 ```{r}
 sessionInfo()
 ```
+
+</details>
 
