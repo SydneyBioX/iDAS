@@ -4,6 +4,11 @@ Interpretable Differential Abundance Signature
 
 Single-cell technologies have revolutionized our understanding of cellular dynamics by allowing researchers to investigate individual cell responses under various conditions, such as comparing diseased versus healthy states. Many differential abundance methods have been developed in this field, however, the understanding of the gene signatures obtained from those methods is often incomplete, requiring the integration of cell type information and other biological factors to yield interpretable and meaningful results. To better interpret the gene signatures generated in the differential abundance analysis, we developed iDAS to classify the gene signatures into multiple categories.  
 
+
+![idas_workflow](./man/figures/idas_workflow.png)
+
+
+
 ## Installation
 
 The iDAS package is still under development to meet Bioconductor standards. If you have any questions, please don't hesitate to open an issue.
@@ -17,11 +22,15 @@ devtools::install_github("SydneyBioX/iDAS")
 
 ```
 # Example using two factors
-result_twoway <- iDAS(Z = my_feature_matrix, factor1 = group1, factor2 = group2)
+result_twoway <- iDAS(Z = my_feature_matrix, 
+                      factor1 = group1, 
+                      factor2 = group2)
 
 # Example using three factors
-result_threeway <- iDAS(Z = my_feature_matrix, factor1 = group1, 
-                        factor2 = group2, factor3 = timepoint)
+result_threeway <- iDAS(Z = my_feature_matrix, 
+                        factor1 = group1, 
+                        factor2 = group2, 
+                        factor3 = timepoint)
 ```
 
 ### Simulation example
