@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">iDAS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -120,11 +120,125 @@ China.<br><h4 data-toc-skip class="date">2025-04-30</h4>
 
     
     
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
+<p>To better interpret the gene signatures generated in the differential
+abundance analysis, we developed iDAS to group the gene signatures into
+multiple categories.</p>
+<p>We present a two-stage ANOVA-based post-DA model approach to improve
+interpretation for perturbation studies, named interpretable
+differential abundance signature (iDAS). As illustrated in Figure 1, for
+a single-cell dataset with two phenotypes such as responding to
+treatment, we begin with the output from any differential abundance
+algorithm or sample based spatial gene analysis result. Examples
+includes results from identify binary phenotype from Milo or nearest
+neighborhood correlation of genes in spatial samples. Next we build on
+two-way factorial experiments by jointly modeling cell-type (or
+cell-state factor, F1 in Figure 1) and treatment phenotypes factor (F2
+in Figure 1). We then applied the approach similar to NANOVA(Zhou and
+Wong 2011), where we performed a series of “nested” ANOVA and used the
+results between the different models to classify genes into different
+categories relating to main and interaction effects. These groups
+include the main effects for cell type (F1) and treatment phenotype
+(F2), the interaction effect between cell type and phenotype (F1xF2),
+the additive effect of cell type and phenotype (F1+F2), and a
+non-significant group comprising genes not relevant to any of the main
+factors.</p>
+<p><img src="../reference/figures/iDAS_workflow.png" alt="iDAS_workflow"><em>Figure 1. iDAS workflow</em></p>
+</div>
+<div class="section level2">
+<h2 id="idas-functions">iDAS functions<a class="anchor" aria-label="anchor" href="#idas-functions"></a>
+</h2>
+<p>The iDAS package primarily provides functions to group genes based on
+multiple-factor effects. This can be achieved using the iDAS() function.
+We also provide dedicated functions for two-way and three-way analyses,
+such as twofactors() and threefactors().</p>
+<p>iDAS package allows users to apply either a linear regression model
+using the <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm()</a></code> function in <strong>stats</strong> package
+or a linear mixed-effects model using the <code>lmer()</code> function
+from the <strong>lme4</strong> package.</p>
+<p>For all hypothesis tests, users can choose to use either raw p-values
+or adjusted p-values cut off to identify whether a gene is associated
+with a factor of interest. In the first step, where genes are classified
+as associated or not associated with any factor, we also provide an
+option to use a p-value quantile cutoff. This is a user-defined
+percentage value that sets the significance threshold based on the
+distribution of full model p-values or adjusted p-values (See Figure
+1).</p>
+<p>Here, we demostrate the functions using a simple simulation data.</p>
+<div class="section level3">
+<h3 id="two-way-model">Two-way model<a class="anchor" aria-label="anchor" href="#two-way-model"></a>
+</h3>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sydneybiox.github.io/iDAS/">iDAS</a></span><span class="op">)</span></span></code></pre></div>
-<p>just a test, haven’t finished.</p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sydneybiox.github.io/iDAS/">iDAS</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 1. Simulate design: 2 factors, each with 2 levels</span></span>
+<span><span class="va">factor1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span><span class="op">)</span>, each <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span>         <span class="co"># 10 samples</span></span>
+<span><span class="va">factor2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"X"</span>, <span class="st">"Y"</span><span class="op">)</span>, times <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span>        <span class="co"># alternate X/Y</span></span>
+<span></span>
+<span><span class="co"># 2. Simulate gene expression: samples × genes (10 × 10)</span></span>
+<span><span class="va">Z</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span>, mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">10</span>, ncol <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">Z</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"gene"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 3. Inject effects</span></span>
+<span><span class="co"># gene1: Factor1 main effect</span></span>
+<span><span class="va">Z</span><span class="op">[</span><span class="va">factor1</span> <span class="op">==</span> <span class="st">"B"</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">Z</span><span class="op">[</span><span class="va">factor1</span> <span class="op">==</span> <span class="st">"B"</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="fl">4</span>  </span>
+<span><span class="co"># gene2: Factor2 main effect</span></span>
+<span><span class="va">Z</span><span class="op">[</span><span class="va">factor2</span> <span class="op">==</span> <span class="st">"Y"</span>, <span class="fl">2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">Z</span><span class="op">[</span><span class="va">factor2</span> <span class="op">==</span> <span class="st">"Y"</span>, <span class="fl">2</span><span class="op">]</span> <span class="op">+</span> <span class="fl">6</span>  </span>
+<span><span class="co"># gene3: interaction</span></span>
+<span><span class="va">Z</span><span class="op">[</span><span class="va">factor1</span> <span class="op">==</span> <span class="st">"B"</span> <span class="op">&amp;</span> <span class="va">factor2</span> <span class="op">==</span> <span class="st">"Y"</span>, <span class="fl">3</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">Z</span><span class="op">[</span><span class="va">factor1</span> <span class="op">==</span> <span class="st">"B"</span> <span class="op">&amp;</span> <span class="va">factor2</span> <span class="op">==</span> <span class="st">"Y"</span>, <span class="fl">3</span><span class="op">]</span> <span class="op">+</span> <span class="fl">6</span> </span>
+<span></span>
+<span><span class="co"># 4. Run iDAS (Z is already samples × genes, no need to transpose!)</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">iDAS</span><span class="fu">::</span><span class="fu"><a href="../reference/iDAS.html">iDAS</a></span><span class="op">(</span></span>
+<span>    Z <span class="op">=</span> <span class="va">Z</span>,</span>
+<span>    factor1 <span class="op">=</span> <span class="va">factor1</span>,</span>
+<span>    factor2 <span class="op">=</span> <span class="va">factor2</span>,</span>
+<span>    model_fit_function <span class="op">=</span> <span class="st">"lm"</span>,</span>
+<span>    test_function <span class="op">=</span> <span class="st">"parametric"</span>,</span>
+<span>    pval_cutoff_full <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>    pval_cutoff_interaction <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>    pval_cutoff_factor1 <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>    pval_cutoff_factor2 <span class="op">=</span> <span class="fl">0.05</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Running two-factor model"</span></span>
+<span><span class="co">#&gt; [1] "full model"</span></span>
+<span><span class="co">#&gt; [1] "interaction,f1,f2"</span></span>
+<span></span>
+<span><span class="co"># 5. Check output</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">class_df</span><span class="op">)</span></span>
+<span><span class="co">#&gt;        varname    Sig0     Sig1</span></span>
+<span><span class="co">#&gt; gene1    gene1     sig Additive</span></span>
+<span><span class="co">#&gt; gene2    gene2 non-sig     &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; gene3    gene3 non-sig     &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; gene4    gene4 non-sig     &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; gene5    gene5 non-sig     &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; gene6    gene6 non-sig     &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; gene7    gene7 non-sig     &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; gene8    gene8 non-sig     &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; gene9    gene9 non-sig     &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; gene10  gene10 non-sig     &lt;NA&gt;</span></span>
+<span></span>
+<span><span class="co"># 6. (Optional) Add true labels to evaluate accuracy</span></span>
+<span><span class="va">true_labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"null"</span>, <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="va">true_labels</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"F1"</span></span>
+<span><span class="va">true_labels</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"F2"</span></span>
+<span><span class="va">true_labels</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"F1:F2"</span></span>
+<span></span>
+<span><span class="va">result</span><span class="op">$</span><span class="va">class_df</span><span class="op">$</span><span class="va">Sig1</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">class_df</span><span class="op">$</span><span class="va">Sig1</span><span class="op">)</span><span class="op">]</span><span class="op">=</span><span class="st">"null"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span>predicted <span class="op">=</span> <span class="va">result</span><span class="op">$</span><span class="va">class_df</span><span class="op">$</span><span class="va">Sig1</span>, truth <span class="op">=</span> <span class="va">true_labels</span><span class="op">)</span></span>
+<span><span class="co">#&gt;           truth</span></span>
+<span><span class="co">#&gt; predicted  F1 F1:F2 F2 null</span></span>
+<span><span class="co">#&gt;   Additive  1     0  0    0</span></span>
+<span><span class="co">#&gt;   null      0     1  1    7</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="three-way-model">Three-way model<a class="anchor" aria-label="anchor" href="#three-way-model"></a>
+</h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
+<code class="sourceCode R"><span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
 <span><span class="va">Z</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">Z</span><span class="op">)</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"gene"</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="va">factor1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, each <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
@@ -132,10 +246,10 @@ China.<br><h4 data-toc-skip class="date">2025-04-30</h4>
 <span><span class="va">factor3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, length.out <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Run the differential analysis using iDAS</span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/threefactors.html">threefactors</a></span><span class="op">(</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">iDAS</span><span class="fu">::</span><span class="fu"><a href="../reference/iDAS.html">iDAS</a></span><span class="op">(</span></span>
 <span>  <span class="va">Z</span>, <span class="va">factor1</span>, <span class="va">factor2</span>, <span class="va">factor3</span>,</span>
 <span>  model_fit_function <span class="op">=</span> <span class="st">"lm"</span>,</span>
-<span>  test_function <span class="op">=</span> <span class="st">"anova_test"</span>,</span>
+<span>  test_function <span class="op">=</span> <span class="st">"parametric"</span>,</span>
 <span>  pval_quantile_cutoff <span class="op">=</span> <span class="fl">0.02</span>,</span>
 <span>  pval_cutoff_full <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  pval_cutoff_interaction <span class="op">=</span> <span class="fl">0.01</span>,</span>
@@ -145,49 +259,37 @@ China.<br><h4 data-toc-skip class="date">2025-04-30</h4>
 <span>  pval_cutoff_int12 <span class="op">=</span> <span class="fl">0.01</span>,</span>
 <span>  pval_cutoff_int13 <span class="op">=</span> <span class="fl">0.01</span>,</span>
 <span>  pval_cutoff_int23 <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span>  pval_cutoff_int123 <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span>  p_adjust_method <span class="op">=</span> <span class="st">"BH"</span></span>
+<span>  pval_cutoff_int123 <span class="op">=</span> <span class="fl">0.01</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Running three-factor model"</span></span>
 <span></span>
 <span><span class="co"># Inspect results</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">pval_matrix</span><span class="op">)</span></span>
-<span><span class="co">#&gt;            Sig0 Intornotint        F1        F2        F3 twowaysorthreeways</span></span>
-<span><span class="co">#&gt; gene1 0.9540973          NA        NA        NA        NA                 NA</span></span>
-<span><span class="co">#&gt; gene2 0.5307338   0.2145375 0.8552708 0.8455880 0.8455880                 NA</span></span>
-<span><span class="co">#&gt; gene3 0.5307338   0.6898299 0.1901815 0.6042505 0.6042505                 NA</span></span>
-<span><span class="co">#&gt; gene4 0.9540973          NA        NA        NA        NA                 NA</span></span>
-<span><span class="co">#&gt; gene5 0.5307338   0.6156138 0.1521301 0.8455880 0.8455880                 NA</span></span>
-<span><span class="co">#&gt; gene6 0.9540973          NA        NA        NA        NA                 NA</span></span>
-<span><span class="co">#&gt;       F1F2 F2F3 F1F3</span></span>
-<span><span class="co">#&gt; gene1   NA   NA   NA</span></span>
-<span><span class="co">#&gt; gene2   NA   NA   NA</span></span>
-<span><span class="co">#&gt; gene3   NA   NA   NA</span></span>
-<span><span class="co">#&gt; gene4   NA   NA   NA</span></span>
-<span><span class="co">#&gt; gene5   NA   NA   NA</span></span>
-<span><span class="co">#&gt; gene6   NA   NA   NA</span></span>
+<span><span class="co">#&gt;            Sig0 Intornotint F1 F2 F3 twowaysorthreeways F1F2 F2F3 F1F3</span></span>
+<span><span class="co">#&gt; gene1 0.7628099          NA NA NA NA                 NA   NA   NA   NA</span></span>
+<span><span class="co">#&gt; gene2 0.8770827          NA NA NA NA                 NA   NA   NA   NA</span></span>
+<span><span class="co">#&gt; gene3 0.5928445          NA NA NA NA                 NA   NA   NA   NA</span></span>
+<span><span class="co">#&gt; gene4 0.3284234          NA NA NA NA                 NA   NA   NA   NA</span></span>
+<span><span class="co">#&gt; gene5 0.3128253          NA NA NA NA                 NA   NA   NA   NA</span></span>
+<span><span class="co">#&gt; gene6 0.9778635          NA NA NA NA                 NA   NA   NA   NA</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">stat_matrix</span><span class="op">)</span></span>
-<span><span class="co">#&gt;            Sig0 Intornotint         F1         F2         F3 twowaysorthreeways</span></span>
-<span><span class="co">#&gt; gene1 0.2039435          NA         NA         NA         NA                 NA</span></span>
-<span><span class="co">#&gt; gene2 1.1881483   3.3210218 0.03344651 0.22985044 0.22985044                 NA</span></span>
-<span><span class="co">#&gt; gene3 1.6073958   0.1602347 2.01962334 1.74419094 1.74419094                 NA</span></span>
-<span><span class="co">#&gt; gene4 0.3181123          NA         NA         NA         NA                 NA</span></span>
-<span><span class="co">#&gt; gene5 1.5258785   1.0512025 3.20561007 0.03813139 0.03813139                 NA</span></span>
-<span><span class="co">#&gt; gene6 0.3879218          NA         NA         NA         NA                 NA</span></span>
-<span><span class="co">#&gt;       F1F2 F2F3 F1F3</span></span>
-<span><span class="co">#&gt; gene1   NA   NA   NA</span></span>
-<span><span class="co">#&gt; gene2   NA   NA   NA</span></span>
-<span><span class="co">#&gt; gene3   NA   NA   NA</span></span>
-<span><span class="co">#&gt; gene4   NA   NA   NA</span></span>
-<span><span class="co">#&gt; gene5   NA   NA   NA</span></span>
-<span><span class="co">#&gt; gene6   NA   NA   NA</span></span>
+<span><span class="co">#&gt;            Sig0 Intornotint F1 F2 F3 twowaysorthreeways F1F2 F2F3 F1F3</span></span>
+<span><span class="co">#&gt; gene1 0.8735446          NA NA NA NA                 NA   NA   NA   NA</span></span>
+<span><span class="co">#&gt; gene2 0.4732061          NA NA NA NA                 NA   NA   NA   NA</span></span>
+<span><span class="co">#&gt; gene3 1.2488545          NA NA NA NA                 NA   NA   NA   NA</span></span>
+<span><span class="co">#&gt; gene4 1.9206980          NA NA NA NA                 NA   NA   NA   NA</span></span>
+<span><span class="co">#&gt; gene5 2.2148863          NA NA NA NA                 NA   NA   NA   NA</span></span>
+<span><span class="co">#&gt; gene6 0.1834940          NA NA NA NA                 NA   NA   NA   NA</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">class_df</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   varname    Sig0   Sig1 notInt</span></span>
-<span><span class="co">#&gt; 1   gene1 non-sig   &lt;NA&gt;   &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 2   gene2     sig notInt    Add</span></span>
-<span><span class="co">#&gt; 3   gene3     sig notInt    Add</span></span>
-<span><span class="co">#&gt; 4   gene4 non-sig   &lt;NA&gt;   &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 5   gene5     sig notInt    Add</span></span>
-<span><span class="co">#&gt; 6   gene6 non-sig   &lt;NA&gt;   &lt;NA&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt;   varname    Sig0 Sig1 notInt</span></span>
+<span><span class="co">#&gt; 1   gene1 non-sig &lt;NA&gt;   &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 2   gene2 non-sig &lt;NA&gt;   &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 3   gene3 non-sig &lt;NA&gt;   &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 4   gene4 non-sig &lt;NA&gt;   &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 5   gene5 non-sig &lt;NA&gt;   &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 6   gene6 non-sig &lt;NA&gt;   &lt;NA&gt;</span></span></code></pre></div>
+</div>
+</div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>

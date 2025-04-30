@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">iDAS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,6 +71,9 @@
 </h1></div>
 <p>Interpretable Differential Abundance Signature</p>
 <p>Single-cell technologies have revolutionized our understanding of cellular dynamics by allowing researchers to investigate individual cell responses under various conditions, such as comparing diseased versus healthy states. Many differential abundance methods have been developed in this field, however, the understanding of the gene signatures obtained from those methods is often incomplete, requiring the integration of cell type information and other biological factors to yield interpretable and meaningful results. To better interpret the gene signatures generated in the differential abundance analysis, we developed iDAS to classify the gene signatures into multiple categories.</p>
+<div class="float">
+<img src="./reference/figures/iDAS_workflow.png" alt="idas_workflow"><div class="figcaption">idas_workflow</div>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -82,11 +85,15 @@
 <h2 id="example-command">Example command<a class="anchor" aria-label="anchor" href="#example-command"></a>
 </h2>
 <pre><code><span><span class="co"># Example using two factors</span></span>
-<span><span class="va">result_twoway</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/iDAS.html">iDAS</a></span><span class="op">(</span>Z <span class="op">=</span> <span class="va">my_feature_matrix</span>, factor1 <span class="op">=</span> <span class="va">group1</span>, factor2 <span class="op">=</span> <span class="va">group2</span><span class="op">)</span></span>
+<span><span class="va">result_twoway</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/iDAS.html">iDAS</a></span><span class="op">(</span>Z <span class="op">=</span> <span class="va">my_feature_matrix</span>,</span>
+<span>                      factor1 <span class="op">=</span> <span class="va">group1</span>,</span>
+<span>                      factor2 <span class="op">=</span> <span class="va">group2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Example using three factors</span></span>
-<span><span class="va">result_threeway</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/iDAS.html">iDAS</a></span><span class="op">(</span>Z <span class="op">=</span> <span class="va">my_feature_matrix</span>, factor1 <span class="op">=</span> <span class="va">group1</span>,</span>
-<span>                        factor2 <span class="op">=</span> <span class="va">group2</span>, factor3 <span class="op">=</span> <span class="va">timepoint</span><span class="op">)</span></span></code></pre>
+<span><span class="va">result_threeway</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/iDAS.html">iDAS</a></span><span class="op">(</span>Z <span class="op">=</span> <span class="va">my_feature_matrix</span>,</span>
+<span>                        factor1 <span class="op">=</span> <span class="va">group1</span>,</span>
+<span>                        factor2 <span class="op">=</span> <span class="va">group2</span>,</span>
+<span>                        factor3 <span class="op">=</span> <span class="va">timepoint</span><span class="op">)</span></span></code></pre>
 <div class="section level3">
 <h3 id="simulation-example">Simulation example<a class="anchor" aria-label="anchor" href="#simulation-example"></a>
 </h3>
@@ -99,10 +106,10 @@
 <span><span class="va">factor3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, length.out <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Run the differential analysis using iDAS</span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/threefactors.html">threefactors</a></span><span class="op">(</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/iDAS.html">iDAS</a></span><span class="op">(</span></span>
 <span>  <span class="va">Z</span>, <span class="va">factor1</span>, <span class="va">factor2</span>, <span class="va">factor3</span>,</span>
 <span>  model_fit_function <span class="op">=</span> <span class="st">"lm"</span>,</span>
-<span>  test_function <span class="op">=</span> <span class="st">"anova_test"</span>,</span>
+<span>  test_function <span class="op">=</span> <span class="st">"parametric"</span>,</span>
 <span>  pval_quantile_cutoff <span class="op">=</span> <span class="fl">0.02</span>,</span>
 <span>  pval_cutoff_full <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  pval_cutoff_interaction <span class="op">=</span> <span class="fl">0.01</span>,</span>
@@ -116,6 +123,7 @@
 <span>  p_adjust_method <span class="op">=</span> <span class="st">"BH"</span></span>
 <span><span class="op">)</span></span></code></pre>
 <p>Results include three table, the p-value (or adjusted p-value) table, F-statistics table, and the gene associated groups.</p>
+<p>The <code>Sig0</code> column represents the test result from the full model. <code>Intornotint</code> indicates whether a significant interaction effect is present. <code>F1</code>, <code>F2</code>, and <code>F3</code> represent tests for gene associations with the main effects of Factor 1, Factor 2, and Factor 3, respectively. <code>Twowaysorthreeways</code> distinguishes whether the interaction effect is a two-way or three-way interaction. <code>F1F2</code>, <code>F2F3</code>, and <code>F1F3</code> correspond to the three types of two-way interaction effects.</p>
 <pre><code><span><span class="co"># Inspect results</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">pval_matrix</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">stat_matrix</span><span class="op">)</span></span>
