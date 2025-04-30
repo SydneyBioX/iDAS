@@ -5,7 +5,7 @@ Interpretable Differential Abundance Signature
 Single-cell technologies have revolutionized our understanding of cellular dynamics by allowing researchers to investigate individual cell responses under various conditions, such as comparing diseased versus healthy states. Many differential abundance methods have been developed in this field, however, the understanding of the gene signatures obtained from those methods is often incomplete, requiring the integration of cell type information and other biological factors to yield interpretable and meaningful results. To better interpret the gene signatures generated in the differential abundance analysis, we developed iDAS to classify the gene signatures into multiple categories.  
 
 
-![idas_workflow](./man/figures/idas_workflow.png)
+![idas_workflow](./man/figures/iDAS_workflow.png)
 
 
 ## Installation
