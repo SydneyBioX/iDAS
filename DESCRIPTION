@@ -1,6 +1,6 @@
 Package: iDAS
 Title: Interpretable differential abundance analysis
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: c(
     person("Lijia", "Yu", , "yulj2010@gmail.com", role = c("aut","cre","ctb")),
     person("Yingxin", "Lin", email = "yingxinlin.res@gmail.com", role = "aut"),
