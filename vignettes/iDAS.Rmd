@@ -58,9 +58,13 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(iDAS)
+
+demo <- readRDS(system.file("extdata", "melanoma_example.rds", package = "iDAS"))
 ```
 
 just a test, haven't finished.
+
+
 
 ```{r}
 set.seed(123)

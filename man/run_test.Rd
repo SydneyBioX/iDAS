@@ -24,10 +24,10 @@ run_test(
 \item{model_fit_function}{A function used to fit the model (e.g. \code{lm}, \code{glm}, etc.).}
 
 \item{test_function}{A character string specifying which test to run. Must be either
-\code{"anova_test"} or \code{"perm_anova_test"}.}
+\code{"parametric"} or \code{"permutation"}.}
 
 \item{n_perm}{An integer specifying the number of permutations to use when
-\code{test_function = "perm_anova_test"}. Default is \code{1000}.}
+\code{test_function = "permutation"}. Default is \code{1000}.}
 
 \item{BPPARAM}{An optional \code{\link[BiocParallel]{BiocParallelParam}} object for parallel computation.
 Defaults to \code{\link[BiocParallel]{MulticoreParam}()}.}
@@ -39,8 +39,8 @@ The result object returned by either \code{\link{anova_test}} or
 \description{
 This function calls either \code{\link{anova_test}} or \code{\link{perm_anova_test}}
 based on the specified \code{test_function}. If \code{test_function} is
-\code{"anova_test"}, a standard ANOVA is performed. If \code{test_function} is
-\code{"perm_anova_test"}, a permutation-based ANOVA is performed.
+\code{"parametric"}, a standard ANOVA is performed. If \code{test_function} is
+\code{"permutation"}, a permutation-based ANOVA is performed.
 }
 \examples{
 \dontrun{
@@ -50,7 +50,7 @@ based on the specified \code{test_function}. If \code{test_function} is
     formula0 = mpg ~ 1,
     formula1 = mpg ~ cyl,
     model_fit_function = "lm",
-    test_function = "anova_test"
+    test_function = "parametric"
   )
 
   # Example using a linear model and permutation-based ANOVA:
@@ -59,7 +59,7 @@ based on the specified \code{test_function}. If \code{test_function} is
     formula0 = mpg ~ 1,
     formula1 = mpg ~ cyl,
     model_fit_function = "lm",
-    test_function = "perm_anova_test",
+    test_function = "permutation",
     n_perm = 500
   )
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/iDAS_functions.R
 \name{twofactors}
 \alias{twofactors}
-\title{Two-Factor Differential Analysis}
+\title{iDAS: Interpretable Differential Analysis of Genes with two Factors}
 \usage{
 twofactors(
   Z,
@@ -13,7 +13,7 @@ twofactors(
   p_adjust_method_for_factors_and_interation = FALSE,
   pval_quantile_cutoff = 0.02,
   pval_cutoff_full = 0.05,
-  test_function = "anova_test",
+  test_function = "parametric",
   pval_cutoff_interaction = 0.01,
   pval_cutoff_factor1 = 0.01,
   pval_cutoff_factor2 = 0.01,
@@ -46,7 +46,7 @@ Defaults to \code{0.02}.}
 \item{pval_cutoff_full}{Numeric; the p-value threshold for the overall model test. Defaults to \code{0.05}.}
 
 \item{test_function}{A character string specifying which test function to use for statistical comparison.
-Defaults to \code{"anova_test"}. Other valid functions (if implemented) might include \code{"perm_anova_test"}, etc.}
+Defaults to \code{"parametric"}. Other valid functions (if implemented) might include \code{"permutation"}, etc.}
 
 \item{pval_cutoff_interaction}{Numeric; the p-value threshold for testing the interaction effect. Defaults to \code{0.01}.}
 
@@ -95,7 +95,7 @@ results <- twofactors(
   p_adjust_method_for_factors_and_interation = FALSE,
   pval_quantile_cutoff = 0.02,
   pval_cutoff_full = 0.05,
-  test_function = "anova_test",
+  test_function = "parametric",
   pval_cutoff_interaction = 0.01,
   pval_cutoff_factor1 = 0.01,
   pval_cutoff_factor2 = 0.01,

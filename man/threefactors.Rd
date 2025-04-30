@@ -2,7 +2,7 @@
 % Please edit documentation in R/iDAS_functions.R
 \name{threefactors}
 \alias{threefactors}
-\title{iDAS: Interpretable Differential Analysis of Genes Using Three Factors}
+\title{iDAS: Interpretable Differential Analysis of Genes with Three Factors}
 \usage{
 threefactors(
   Z,
@@ -11,7 +11,7 @@ threefactors(
   factor3,
   random_effect = NULL,
   model_fit_function = "lm",
-  test_function = "anova_test",
+  test_function = "parametric",
   pval_quantile_cutoff = 0.02,
   pval_cutoff_full = 0.05,
   pval_cutoff_interaction = 0.01,
@@ -47,7 +47,7 @@ if no random effects are included.}
 for linear models, \code{"lmer"} for mixed-effects models). Default is \code{"lm"}.}
 
 \item{test_function}{A character string specifying the testing function to use
-(e.g., \code{"anova_test"}). Default is \code{"anova_test"}.}
+(e.g., \code{"parametric"}, \code{"permutation"}). Default is \code{"parametric"}.}
 
 \item{pval_quantile_cutoff}{A numeric threshold for the quantile-based filtering of overall p-values
 (i.e., only genes with overall p-values below the specified quantile are considered for further tests).
@@ -138,7 +138,7 @@ factor3 <- as.factor(rep(1:2, length.out = 10))
 result <- threefactors(
   Z, factor1, factor2, factor3,
   model_fit_function = "lm",
-  test_function = "anova_test",
+  test_function = "parametric",
   pval_quantile_cutoff = 0.02,
   pval_cutoff_full = 0.05,
   pval_cutoff_interaction = 0.01,

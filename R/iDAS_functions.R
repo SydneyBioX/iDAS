@@ -131,17 +131,17 @@ perm_anova_test <- function(data, formula0, formula1, model_fit_function, n_perm
 #'
 #' This function calls either \code{\link{anova_test}} or \code{\link{perm_anova_test}}
 #' based on the specified \code{test_function}. If \code{test_function} is
-#' \code{"anova_test"}, a standard ANOVA is performed. If \code{test_function} is
-#' \code{"perm_anova_test"}, a permutation-based ANOVA is performed.
+#' \code{"parametric"}, a standard ANOVA is performed. If \code{test_function} is
+#' \code{"permutation"}, a permutation-based ANOVA is performed.
 #'
 #' @param data A data frame containing the variables referenced in \code{formula0} and \code{formula1}.
 #' @param formula0 A formula specifying the reduced model.
 #' @param formula1 A formula specifying the full model.
 #' @param model_fit_function A function used to fit the model (e.g. \code{lm}, \code{glm}, etc.).
 #' @param test_function A character string specifying which test to run. Must be either
-#'   \code{"anova_test"} or \code{"perm_anova_test"}.
+#'   \code{"parametric"} or \code{"permutation"}.
 #' @param n_perm An integer specifying the number of permutations to use when
-#'   \code{test_function = "perm_anova_test"}. Default is \code{1000}.
+#'   \code{test_function = "permutation"}. Default is \code{1000}.
 #' @param BPPARAM An optional \code{\link[BiocParallel]{BiocParallelParam}} object for parallel computation.
 #'   Defaults to \code{\link[BiocParallel]{MulticoreParam}()}.
 #'
@@ -158,7 +158,7 @@ perm_anova_test <- function(data, formula0, formula1, model_fit_function, n_perm
 #'     formula0 = mpg ~ 1,
 #'     formula1 = mpg ~ cyl,
 #'     model_fit_function = "lm",
-#'     test_function = "anova_test"
+#'     test_function = "parametric"
 #'   )
 #'
 #'   # Example using a linear model and permutation-based ANOVA:
@@ -167,19 +167,19 @@ perm_anova_test <- function(data, formula0, formula1, model_fit_function, n_perm
 #'     formula0 = mpg ~ 1,
 #'     formula1 = mpg ~ cyl,
 #'     model_fit_function = "lm",
-#'     test_function = "perm_anova_test",
+#'     test_function = "permutation",
 #'     n_perm = 500
 #'   )
 #' }
 #'
 #' @keywords internal
 run_test<- function(data, formula0, formula1, model_fit_function, test_function, n_perm = 1000,BPPARAM = MulticoreParam()) {
-  if (test_function == "anova_test") {
+  if (test_function == "parametric") {
     return(anova_test(data, formula0, formula1, model_fit_function))
-  } else if (test_function == "perm_anova_test") {
+  } else if (test_function == "permutation") {
     return(perm_anova_test(data, formula0, formula1, model_fit_function, n_perm,BPPARAM = MulticoreParam()))
   } else {
-    stop("Invalid test function name. Choose 'anova_test' or 'perm_anova_test'.")
+    stop("Invalid test function name. Choose 'parametric' or 'permutation'.")
   }
 }
 
@@ -203,7 +203,7 @@ run_test<- function(data, formula0, formula1, model_fit_function, test_function,
 #'   Defaults to \code{0.02}.
 #' @param pval_cutoff_full Numeric; the p-value threshold for the overall model test. Defaults to \code{0.05}.
 #' @param test_function A character string specifying which test function to use for statistical comparison.
-#'   Defaults to \code{"anova_test"}. Other valid functions (if implemented) might include \code{"perm_anova_test"}, etc.
+#'   Defaults to \code{"parametric"}. Other valid functions (if implemented) might include \code{"permutation"}, etc.
 #' @param pval_cutoff_interaction Numeric; the p-value threshold for testing the interaction effect. Defaults to \code{0.01}.
 #' @param pval_cutoff_factor1 Numeric; the p-value threshold for testing the main effect of \code{factor1}.
 #'   Defaults to \code{0.01}.
@@ -238,7 +238,7 @@ run_test<- function(data, formula0, formula1, model_fit_function, test_function,
 #'   p_adjust_method_for_factors_and_interation = FALSE,
 #'   pval_quantile_cutoff = 0.02,
 #'   pval_cutoff_full = 0.05,
-#'   test_function = "anova_test",
+#'   test_function = "parametric",
 #'   pval_cutoff_interaction = 0.01,
 #'   pval_cutoff_factor1 = 0.01,
 #'   pval_cutoff_factor2 = 0.01,
@@ -255,7 +255,7 @@ run_test<- function(data, formula0, formula1, model_fit_function, test_function,
 #' @export
 twofactors <- function(Z, factor1, factor2, random_effect = NULL,
                     model_fit_function = "lm",p_adjust_method_for_factors_and_interation=FALSE,
-                    pval_quantile_cutoff = 0.02, pval_cutoff_full = 0.05,test_function="anova_test",
+                    pval_quantile_cutoff = 0.02, pval_cutoff_full = 0.05,test_function="parametric",
                     pval_cutoff_interaction = 0.01, pval_cutoff_factor1 = 0.01, pval_cutoff_factor2 = 0.01,
                     p_adjust_method = "BH", factor1_name = NULL, factor2_name = NULL, random_effect_name = NULL,...) {
 
@@ -708,7 +708,7 @@ build_formulas <- function(formatted_factors, test_func, random_effect) {
 #' @param model_fit_function A character string specifying the model-fitting function (e.g., \code{"lm"}
 #'   for linear models, \code{"lmer"} for mixed-effects models). Default is \code{"lm"}.
 #' @param test_function A character string specifying the testing function to use
-#'   (e.g., \code{"anova_test"}). Default is \code{"anova_test"}.
+#'   (e.g., \code{"parametric"}, \code{"permutation"}). Default is \code{"parametric"}.
 #' @param pval_quantile_cutoff A numeric threshold for the quantile-based filtering of overall p-values
 #'   (i.e., only genes with overall p-values below the specified quantile are considered for further tests).
 #'   Default is \code{0.02}.
@@ -776,7 +776,7 @@ build_formulas <- function(formatted_factors, test_func, random_effect) {
 #' result <- threefactors(
 #'   Z, factor1, factor2, factor3,
 #'   model_fit_function = "lm",
-#'   test_function = "anova_test",
+#'   test_function = "parametric",
 #'   pval_quantile_cutoff = 0.02,
 #'   pval_cutoff_full = 0.05,
 #'   pval_cutoff_interaction = 0.01,
@@ -797,7 +797,7 @@ build_formulas <- function(formatted_factors, test_func, random_effect) {
 #' }
 #'
 #' @export
-threefactors <- function(Z, factor1, factor2, factor3, random_effect = NULL, model_fit_function = "lm",test_function="anova_test",
+threefactors <- function(Z, factor1, factor2, factor3, random_effect = NULL, model_fit_function = "lm",test_function="parametric",
                     pval_quantile_cutoff = 0.02, pval_cutoff_full = 0.05, pval_cutoff_interaction = 0.01,
                     pval_cutoff_factor1 = 0.01, pval_cutoff_factor2 = 0.01, pval_cutoff_factor3 = 0.01,
                     pval_cutoff_int12 = 0.01, pval_cutoff_int13 = 0.01, pval_cutoff_int23 = 0.01,
