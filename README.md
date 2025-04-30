@@ -8,14 +8,14 @@ Single-cell technologies have revolutionized our understanding of cellular dynam
 
 The iDAS package is still under development to meet Bioconductor standards. If you have any questions, please don't hesitate to open an issue.
 
-```{r}
+```
 ## install from github
 devtools::install_github("SydneyBioX/iDAS")
 ```
 
 ## Example command
 
-```{r}
+```
 # Example using two factors
 result_twoway <- iDAS(Z = my_feature_matrix, factor1 = group1, factor2 = group2)
 
@@ -28,7 +28,7 @@ result_threeway <- iDAS(Z = my_feature_matrix, factor1 = group1,
 
 Here, we provide some simple simulation example to show how to use iDAS function.
 
-```{r}
+```
 set.seed(123)
 Z <- matrix(rnorm(1000), ncol = 10)
 colnames(Z)=paste0("gene",1:10)
@@ -58,7 +58,7 @@ result <- threefactors(
 
 Results include three table, the p-value (or adjusted p-value) table, F-statistics table, and the gene associated groups.
 
-```{r}
+```
 # Inspect results
 head(result$pval_matrix)
 head(result$stat_matrix)
