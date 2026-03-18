@@ -16,7 +16,8 @@ set_default_name <- function(name, default) {
 #'
 #' @param x A factor or vector that should be converted.
 #' @param name A character value to assign as the column name.
-#' @return A data frame with one column named \code{name} containing \code{x}.
+#' @return A data frame with one column named \code{name} containing \code{x},
+#'   or the original \code{x} if it is not a factor or vector.
 #' @keywords internal
 process_input <- function(x, name) {
   if (is.factor(x) || is.vector(x)) {

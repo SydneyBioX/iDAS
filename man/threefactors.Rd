@@ -31,8 +31,7 @@ threefactors(
 )
 }
 \arguments{
-\item{Z}{A numeric matrix or data frame where each column represents a gene's expression (or abundance)
-and each row corresponds to an observation (e.g., a sample).}
+\item{Z}{A numeric matrix or data frame where each column represents a feature and each row represents an observation.}
 
 \item{factor1}{A factor or vector representing the primary experimental factor.}
 
@@ -40,59 +39,41 @@ and each row corresponds to an observation (e.g., a sample).}
 
 \item{factor3}{A factor or vector representing the tertiary experimental factor.}
 
-\item{random_effect}{An optional factor or vector for random effects (e.g., subject ID). Use \code{NULL}
-if no random effects are included.}
+\item{random_effect}{An optional factor or vector for random effects (e.g., subject ID). Use \code{NULL} if not applicable.}
 
-\item{model_fit_function}{A character string specifying the model-fitting function (e.g., \code{"lm"}
-for linear models, \code{"lmer"} for mixed-effects models). Default is \code{"lm"}.}
+\item{model_fit_function}{A character string specifying the model-fitting function (e.g., \code{"lm"} or \code{"lmer"}). Defaults to \code{"lm"}.}
 
-\item{test_function}{A character string specifying the testing function to use
-(e.g., \code{"parametric"}, \code{"permutation"}). Default is \code{"parametric"}.}
+\item{test_function}{A character string specifying the testing function to use (e.g., \code{"parametric"} or \code{"permutation"}). Defaults to \code{"parametric"}.}
 
-\item{pval_quantile_cutoff}{A numeric threshold for the quantile-based filtering of overall p-values
-(i.e., only genes with overall p-values below the specified quantile are considered for further tests).
-Default is \code{0.02}.}
+\item{pval_quantile_cutoff}{A numeric threshold for the quantile-based filtering of overall p-values. Defaults to \code{0.02}.}
 
-\item{pval_cutoff_full}{A numeric p-value cutoff for the overall model test. Default is \code{0.05}.}
+\item{pval_cutoff_full}{A numeric p-value cutoff for the overall model test. Defaults to \code{0.05}.}
 
-\item{pval_cutoff_interaction}{A numeric p-value cutoff for the omnibus interaction test (i.e., is there
-\emph{any} interaction?). Default is \code{0.01}.}
+\item{pval_cutoff_interaction}{A numeric p-value cutoff for the omnibus interaction test. Defaults to \code{0.01}.}
 
-\item{pval_cutoff_factor1}{A numeric p-value cutoff for testing the main effect of \code{factor1}.
-Default is \code{0.01}.}
+\item{pval_cutoff_factor1}{A numeric p-value cutoff for testing the main effect of \code{factor1}. Defaults to \code{0.01}.}
 
-\item{pval_cutoff_factor2}{A numeric p-value cutoff for testing the main effect of \code{factor2}.
-Default is \code{0.01}.}
+\item{pval_cutoff_factor2}{A numeric p-value cutoff for testing the main effect of \code{factor2}. Defaults to \code{0.01}.}
 
-\item{pval_cutoff_factor3}{A numeric p-value cutoff for testing the main effect of \code{factor3}.
-Default is \code{0.01}.}
+\item{pval_cutoff_factor3}{A numeric p-value cutoff for testing the main effect of \code{factor3}. Defaults to \code{0.01}.}
 
-\item{pval_cutoff_int12}{A numeric p-value cutoff for the two-way interaction between \code{factor1}
-and \code{factor2}. Default is \code{0.01}.}
+\item{pval_cutoff_int12}{Numeric p-value cutoff for the two-way interaction between factor1 and factor2. Defaults to \code{0.01}.}
 
-\item{pval_cutoff_int13}{A numeric p-value cutoff for the two-way interaction between \code{factor1}
-and \code{factor3}. Default is \code{0.01}.}
+\item{pval_cutoff_int13}{Numeric p-value cutoff for the two-way interaction between factor1 and factor3. Defaults to \code{0.01}.}
 
-\item{pval_cutoff_int23}{A numeric p-value cutoff for the two-way interaction between \code{factor2}
-and \code{factor3}. Default is \code{0.01}.}
+\item{pval_cutoff_int23}{Numeric p-value cutoff for the two-way interaction between factor2 and factor3. Defaults to \code{0.01}.}
 
-\item{pval_cutoff_int123}{A numeric p-value cutoff for the three-way interaction among \code{factor1},
-\code{factor2}, and \code{factor3}. Default is \code{0.01}.}
+\item{pval_cutoff_int123}{Numeric p-value cutoff for the three-way interaction among all factors. Defaults to \code{0.01}.}
 
-\item{p_adjust_method}{A character string specifying the method used to adjust p-values for multiple
-comparisons (e.g., \code{"BH"}). Default is \code{"BH"}.}
+\item{p_adjust_method}{A character string specifying the method used to adjust p-values (e.g., \code{"BH"}). Defaults to \code{"BH"}.}
 
-\item{factor1_name}{An optional character string to label \code{factor1} in outputs or formulas.
-Default is \code{NULL}.}
+\item{factor1_name}{Optional label for \code{factor1}.}
 
-\item{factor2_name}{An optional character string to label \code{factor2} in outputs or formulas.
-Default is \code{NULL}.}
+\item{factor2_name}{Optional label for \code{factor2}.}
 
-\item{factor3_name}{An optional character string to label \code{factor3} in outputs or formulas.
-Default is \code{NULL}.}
+\item{factor3_name}{Optional label for \code{factor3}.}
 
-\item{random_effect_name}{An optional character string to label the random effect in outputs or formulas.
-Default is \code{NULL}.}
+\item{random_effect_name}{Optional label for the random effect.}
 
 \item{\dots}{Additional arguments passed to internal functions, model-fitting routines, or test functions.}
 }
@@ -107,10 +88,11 @@ and interactions.}
 }
 }
 \description{
-This function implements the iDAS (Interpretable Differential Analysis Signature) framework to identify genes
-associated with three experimental factors (\code{factor1}, \code{factor2}, and \code{factor3}), as well as
-their interactions. The analysis involves an overall model test, interaction tests (two-way and three-way),
-and main effects tests. Results include adjusted p-values and test statistics for each gene.
+This function implements the iDAS (Interpretable Differential Analysis Signature) framework to identify
+features associated with three experimental factors (\code{factor1}, \code{factor2}, and \code{factor3}),
+as well as their interactions. The analysis involves an overall model test, interaction tests
+(two-way and three-way), and main effects tests. Results include adjusted p-values and test
+statistics for each feature.
 }
 \details{
 Internally, the function:

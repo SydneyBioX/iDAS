@@ -2,7 +2,7 @@
 % Please edit documentation in R/iDAS_functions.R
 \name{twofactors}
 \alias{twofactors}
-\title{iDAS: Interpretable Differential Analysis of Genes with two Factors}
+\title{iDAS: Interpretable Differential Analysis of Genes with Two Factors}
 \usage{
 twofactors(
   Z,
@@ -25,7 +25,7 @@ twofactors(
 )
 }
 \arguments{
-\item{Z}{A matrix or data frame where each column represents a feature and each row represents an observation.}
+\item{Z}{A numeric matrix or data frame where each column represents a feature (e.g., gene expression) and each row represents an observation.}
 
 \item{factor1}{A factor or vector representing the first categorical variable.}
 
@@ -81,9 +81,10 @@ based on the analysis.}
 }
 }
 \description{
-Conducts a differential analysis for each feature (column) in the data matrix \code{Z} using two experimental factors.
-The function employs either a linear model (\code{lm}) or a mixed-effects model (\code{lmer}) depending on the presence
-of a random effect, and can perform follow-up tests (e.g., ANOVA tests) for interactions and main effects.
+This function implements the iDAS (Interpretable Differential Analysis Signature) framework to identify
+features associated with two experimental factors (\code{factor1} and \code{factor2}), as well as
+their interaction. The analysis involves an overall model test, followed by specific tests for
+interactions and main effects. Results include adjusted p-values and test statistics for each feature.
 }
 \examples{
 \dontrun{

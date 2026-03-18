@@ -2,7 +2,7 @@
 % Please edit documentation in R/iDAS_functions.R
 \name{iDAS}
 \alias{iDAS}
-\title{iDAS: Interpretable Differential Abundance analysis}
+\title{iDAS: Interpretable Differential Abundance Analysis}
 \usage{
 iDAS(
   Z,
@@ -66,9 +66,12 @@ iDAS(
 A list containing the results from the differential abundance analysis. The output typically includes matrices of p-values and test statistics, and a data frame classifying features based on significance.
 }
 \description{
-This function implements the iDAS (Interpretable Differential Abundance analysis) framework for analyzing differential abundance gene signatures.
-It supports both two-factor and three-factor designs. When a third factor is provided, a three-factor analysis is performed via the \code{threefactors} function;
-otherwise, a two-factor analysis is executed via the \code{twofactors} function.
+This function implements the iDAS (Interpretable Differential Abundance Analysis Signature)
+framework for analyzing differential abundance gene signatures. It serves as a
+comprehensive wrapper supporting both two-factor and three-factor experimental designs.
+When a third factor is provided, a three-factor analysis is performed via the
+\code{threefactors} function; otherwise, a two-factor analysis is executed via
+the \code{twofactors} function.
 }
 \details{
 The function distinguishes between a two-factor design and a three-factor design based on whether \code{factor3} is provided.

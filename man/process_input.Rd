@@ -12,7 +12,8 @@ process_input(x, name)
 \item{name}{A character value to assign as the column name.}
 }
 \value{
-A data frame with one column named \code{name} containing \code{x}.
+A data frame with one column named \code{name} containing \code{x},
+or the original \code{x} if it is not a factor or vector.
 }
 \description{
 Converts a factor or vector to a data frame and assigns a specified column name.

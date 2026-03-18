@@ -1,6 +1,6 @@
 Package: iDAS
 Title: Interpretable differential abundance analysis
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(
     person("Lijia", "Yu", , "yulj2010@gmail.com", role = c("aut","cre","ctb")),
     person("Yingxin", "Lin", email = "yingxinlin.res@gmail.com", role = "aut"),
@@ -12,7 +12,7 @@ Description: Single-cell technologies have revolutionized our understanding of c
 License: GPL
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 biocViews:
 Imports:
     BiocParallel,

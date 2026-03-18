@@ -184,13 +184,14 @@ run_test<- function(data, formula0, formula1, model_fit_function, test_function,
 }
 
 
-#' iDAS: Interpretable Differential Analysis of Genes with two Factors
+#' iDAS: Interpretable Differential Analysis of Genes with Two Factors
 #'
-#' Conducts a differential analysis for each feature (column) in the data matrix \code{Z} using two experimental factors.
-#' The function employs either a linear model (\code{lm}) or a mixed-effects model (\code{lmer}) depending on the presence
-#' of a random effect, and can perform follow-up tests (e.g., ANOVA tests) for interactions and main effects.
+#' This function implements the iDAS (Interpretable Differential Analysis Signature) framework to identify
+#' features associated with two experimental factors (\code{factor1} and \code{factor2}), as well as
+#' their interaction. The analysis involves an overall model test, followed by specific tests for
+#' interactions and main effects. Results include adjusted p-values and test statistics for each feature.
 #'
-#' @param Z A matrix or data frame where each column represents a feature and each row represents an observation.
+#' @param Z A numeric matrix or data frame where each column represents a feature (e.g., gene expression) and each row represents an observation.
 #' @param factor1 A factor or vector representing the first categorical variable.
 #' @param factor2 A factor or vector representing the second categorical variable.
 #' @param random_effect An optional factor or vector representing a random effect (e.g., subject ID).
@@ -693,52 +694,34 @@ build_formulas <- function(formatted_factors, test_func, random_effect) {
 
 #' iDAS: Interpretable Differential Analysis of Genes with Three Factors
 #'
-#' This function implements the iDAS (Interpretable Differential Analysis Signature) framework to identify genes
-#' associated with three experimental factors (\code{factor1}, \code{factor2}, and \code{factor3}), as well as
-#' their interactions. The analysis involves an overall model test, interaction tests (two-way and three-way),
-#' and main effects tests. Results include adjusted p-values and test statistics for each gene.
+#' This function implements the iDAS (Interpretable Differential Analysis Signature) framework to identify
+#' features associated with three experimental factors (\code{factor1}, \code{factor2}, and \code{factor3}),
+#' as well as their interactions. The analysis involves an overall model test, interaction tests
+#' (two-way and three-way), and main effects tests. Results include adjusted p-values and test
+#' statistics for each feature.
 #'
-#' @param Z A numeric matrix or data frame where each column represents a gene's expression (or abundance)
-#'   and each row corresponds to an observation (e.g., a sample).
+#' @param Z A numeric matrix or data frame where each column represents a feature and each row represents an observation.
 #' @param factor1 A factor or vector representing the primary experimental factor.
 #' @param factor2 A factor or vector representing the secondary experimental factor.
 #' @param factor3 A factor or vector representing the tertiary experimental factor.
-#' @param random_effect An optional factor or vector for random effects (e.g., subject ID). Use \code{NULL}
-#'   if no random effects are included.
-#' @param model_fit_function A character string specifying the model-fitting function (e.g., \code{"lm"}
-#'   for linear models, \code{"lmer"} for mixed-effects models). Default is \code{"lm"}.
-#' @param test_function A character string specifying the testing function to use
-#'   (e.g., \code{"parametric"}, \code{"permutation"}). Default is \code{"parametric"}.
-#' @param pval_quantile_cutoff A numeric threshold for the quantile-based filtering of overall p-values
-#'   (i.e., only genes with overall p-values below the specified quantile are considered for further tests).
-#'   Default is \code{0.02}.
-#' @param pval_cutoff_full A numeric p-value cutoff for the overall model test. Default is \code{0.05}.
-#' @param pval_cutoff_interaction A numeric p-value cutoff for the omnibus interaction test (i.e., is there
-#'   *any* interaction?). Default is \code{0.01}.
-#' @param pval_cutoff_factor1 A numeric p-value cutoff for testing the main effect of \code{factor1}.
-#'   Default is \code{0.01}.
-#' @param pval_cutoff_factor2 A numeric p-value cutoff for testing the main effect of \code{factor2}.
-#'   Default is \code{0.01}.
-#' @param pval_cutoff_factor3 A numeric p-value cutoff for testing the main effect of \code{factor3}.
-#'   Default is \code{0.01}.
-#' @param pval_cutoff_int12 A numeric p-value cutoff for the two-way interaction between \code{factor1}
-#'   and \code{factor2}. Default is \code{0.01}.
-#' @param pval_cutoff_int13 A numeric p-value cutoff for the two-way interaction between \code{factor1}
-#'   and \code{factor3}. Default is \code{0.01}.
-#' @param pval_cutoff_int23 A numeric p-value cutoff for the two-way interaction between \code{factor2}
-#'   and \code{factor3}. Default is \code{0.01}.
-#' @param pval_cutoff_int123 A numeric p-value cutoff for the three-way interaction among \code{factor1},
-#'   \code{factor2}, and \code{factor3}. Default is \code{0.01}.
-#' @param p_adjust_method A character string specifying the method used to adjust p-values for multiple
-#'   comparisons (e.g., \code{"BH"}). Default is \code{"BH"}.
-#' @param factor1_name An optional character string to label \code{factor1} in outputs or formulas.
-#'   Default is \code{NULL}.
-#' @param factor2_name An optional character string to label \code{factor2} in outputs or formulas.
-#'   Default is \code{NULL}.
-#' @param factor3_name An optional character string to label \code{factor3} in outputs or formulas.
-#'   Default is \code{NULL}.
-#' @param random_effect_name An optional character string to label the random effect in outputs or formulas.
-#'   Default is \code{NULL}.
+#' @param random_effect An optional factor or vector for random effects (e.g., subject ID). Use \code{NULL} if not applicable.
+#' @param model_fit_function A character string specifying the model-fitting function (e.g., \code{"lm"} or \code{"lmer"}). Defaults to \code{"lm"}.
+#' @param test_function A character string specifying the testing function to use (e.g., \code{"parametric"} or \code{"permutation"}). Defaults to \code{"parametric"}.
+#' @param pval_quantile_cutoff A numeric threshold for the quantile-based filtering of overall p-values. Defaults to \code{0.02}.
+#' @param pval_cutoff_full A numeric p-value cutoff for the overall model test. Defaults to \code{0.05}.
+#' @param pval_cutoff_interaction A numeric p-value cutoff for the omnibus interaction test. Defaults to \code{0.01}.
+#' @param pval_cutoff_factor1 A numeric p-value cutoff for testing the main effect of \code{factor1}. Defaults to \code{0.01}.
+#' @param pval_cutoff_factor2 A numeric p-value cutoff for testing the main effect of \code{factor2}. Defaults to \code{0.01}.
+#' @param pval_cutoff_factor3 A numeric p-value cutoff for testing the main effect of \code{factor3}. Defaults to \code{0.01}.
+#' @param pval_cutoff_int12 Numeric p-value cutoff for the two-way interaction between factor1 and factor2. Defaults to \code{0.01}.
+#' @param pval_cutoff_int13 Numeric p-value cutoff for the two-way interaction between factor1 and factor3. Defaults to \code{0.01}.
+#' @param pval_cutoff_int23 Numeric p-value cutoff for the two-way interaction between factor2 and factor3. Defaults to \code{0.01}.
+#' @param pval_cutoff_int123 Numeric p-value cutoff for the three-way interaction among all factors. Defaults to \code{0.01}.
+#' @param p_adjust_method A character string specifying the method used to adjust p-values (e.g., \code{"BH"}). Defaults to \code{"BH"}.
+#' @param factor1_name Optional label for \code{factor1}.
+#' @param factor2_name Optional label for \code{factor2}.
+#' @param factor3_name Optional label for \code{factor3}.
+#' @param random_effect_name Optional label for the random effect.
 #' @param \dots Additional arguments passed to internal functions, model-fitting routines, or test functions.
 #'
 #' @return A list containing:
@@ -1030,11 +1013,14 @@ threefactors <- function(Z, factor1, factor2, factor3, random_effect = NULL, mod
 
 
 
-#' iDAS: Interpretable Differential Abundance analysis
+#' iDAS: Interpretable Differential Abundance Analysis
 #'
-#' This function implements the iDAS (Interpretable Differential Abundance analysis) framework for analyzing differential abundance gene signatures.
-#' It supports both two-factor and three-factor designs. When a third factor is provided, a three-factor analysis is performed via the \code{threefactors} function;
-#' otherwise, a two-factor analysis is executed via the \code{twofactors} function.
+#' This function implements the iDAS (Interpretable Differential Abundance Analysis Signature)
+#' framework for analyzing differential abundance gene signatures. It serves as a
+#' comprehensive wrapper supporting both two-factor and three-factor experimental designs.
+#' When a third factor is provided, a three-factor analysis is performed via the
+#' \code{threefactors} function; otherwise, a two-factor analysis is executed via
+#' the \code{twofactors} function.
 #'
 #' @param Z A numeric matrix or data frame where each column represents a feature (e.g., microbial taxa, metabolites) to be analyzed.
 #' @param factor1 A vector or factor representing the first experimental factor.
