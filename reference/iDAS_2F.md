@@ -1,0 +1,109 @@
+# Interpretable differential abundance analysis (two-way analysis)
+
+This function will be no longer be used.
+
+## Usage
+
+``` r
+iDAS_2F(
+  Z,
+  factor1,
+  factor2,
+  random_effect = NULL,
+  model_fit_function = "lm",
+  pval_quantile_cutoff = 0.02,
+  pval_cutoff_full = 0.05,
+  pval_cutoff_interaction = 0.01,
+  pval_cutoff_factor1 = 0.01,
+  pval_cutoff_factor2 = 0.01,
+  p_adjust_method = "BH",
+  factor1_name = NULL,
+  factor2_name = NULL,
+  random_effect_name = NULL
+)
+```
+
+## Arguments
+
+- Z:
+
+  A matrix/dataframe of omics or gene expression data, row as sample.
+
+- factor1:
+
+  A vector of the first factor variable.
+
+- factor2:
+
+  A vector of the second factor variable.
+
+- random_effect:
+
+  A vector of the random effect term of ANOVA analysis, by default is
+  NULL, which means the model doesn't include a random effect term.
+
+- model_fit_function:
+
+  Model fitting function used, either stats::lm or lme4::lmer. By
+  default is "lm".
+
+- pval_quantile_cutoff:
+
+  A fraction used to determine the significance threshold for the
+  overall (full) model p-values.
+
+- pval_cutoff_full:
+
+  The p-value threshold for the overall (full) model, by default is
+  0.05.
+
+- pval_cutoff_interaction:
+
+  The p-value threshold for the interaction effect, by default is 0.01.
+
+- pval_cutoff_factor1:
+
+  The p-value threshold for the main effect of factor1, by default is
+  0.01.
+
+- pval_cutoff_factor2:
+
+  The p-value threshold for the main effect of factor2, by default is
+  0.01.
+
+- p_adjust_method:
+
+  P-value adjustment method. See p.adjust. By default is "BH".
+
+- factor1_name:
+
+  The column name of the first factor variable, by default is "factor1".
+
+- factor2_name:
+
+  The column name of the second factor variable, by default is
+  "factor2".
+
+- random_effect_name:
+
+  The column name of the random effect term, by default is
+  "random_effect".
+
+## Value
+
+A list of hypothesis test outcomes. pval_matrix is the matrix of
+p-values for all tests, stat_matrix is the matrix of test statistics,
+and class_df is the data frame of class results.
+
+## Examples
+
+``` r
+# res = iDAS_2F(Z = X,
+#               factor1 = pcelltype, factor2 = pcell_stats, random_effect = NULL,
+#               model_fit_function = "lm",
+#               pval_quantile_cutoff = 0.02, pval_cutoff_full = 0.05,
+#               pval_cutoff_interaction = 0.01, pval_cutoff_factor1 = 0.01,
+#               pval_cutoff_factor2 = 0.01,
+#               p_adjust_method = "BH", factor1_name = NULL, factor2_name = NULL,
+#               random_effect_name = NULL)
+```

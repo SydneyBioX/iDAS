@@ -1,10 +1,10 @@
 pandoc: 3.1.11
-pkgdown: 2.1.2
+pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   iDAS_simulation: iDAS_simulation.html
   iDAS: iDAS.html
-last_built: 2025-04-30T12:43Z
+last_built: 2026-03-18T02:35Z
 urls:
   reference: https://sydneybiox.github.io/iDAS/reference
   article: https://sydneybiox.github.io/iDAS/articles

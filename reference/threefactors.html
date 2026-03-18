@@ -5,13 +5,15 @@
       fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
     }
   };
-</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="iDAS: Interpretable Differential Analysis of Genes with Three Factors — threefactors"><meta name="description" content="This function implements the iDAS (Interpretable Differential Analysis Signature) framework to identify genes
-associated with three experimental factors (factor1, factor2, and factor3), as well as
-their interactions. The analysis involves an overall model test, interaction tests (two-way and three-way),
-and main effects tests. Results include adjusted p-values and test statistics for each gene."><meta property="og:description" content="This function implements the iDAS (Interpretable Differential Analysis Signature) framework to identify genes
-associated with three experimental factors (factor1, factor2, and factor3), as well as
-their interactions. The analysis involves an overall model test, interaction tests (two-way and three-way),
-and main effects tests. Results include adjusted p-values and test statistics for each gene."></head><body>
+</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="iDAS: Interpretable Differential Analysis of Genes with Three Factors — threefactors"><meta name="description" content="This function implements the iDAS (Interpretable Differential Analysis Signature) framework to identify
+features associated with three experimental factors (factor1, factor2, and factor3),
+as well as their interactions. The analysis involves an overall model test, interaction tests
+(two-way and three-way), and main effects tests. Results include adjusted p-values and test
+statistics for each feature."><meta property="og:description" content="This function implements the iDAS (Interpretable Differential Analysis Signature) framework to identify
+features associated with three experimental factors (factor1, factor2, and factor3),
+as well as their interactions. The analysis involves an overall model test, interaction tests
+(two-way and three-way), and main effects tests. Results include adjusted p-values and test
+statistics for each feature."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -19,7 +21,7 @@ and main effects tests. Results include adjusted p-values and test statistics fo
 
     <a class="navbar-brand me-2" href="../index.html">iDAS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,10 +58,11 @@ and main effects tests. Results include adjusted p-values and test statistics fo
     </div>
 
     <div class="ref-description section level2">
-    <p>This function implements the iDAS (Interpretable Differential Analysis Signature) framework to identify genes
-associated with three experimental factors (<code>factor1</code>, <code>factor2</code>, and <code>factor3</code>), as well as
-their interactions. The analysis involves an overall model test, interaction tests (two-way and three-way),
-and main effects tests. Results include adjusted p-values and test statistics for each gene.</p>
+    <p>This function implements the iDAS (Interpretable Differential Analysis Signature) framework to identify
+features associated with three experimental factors (<code>factor1</code>, <code>factor2</code>, and <code>factor3</code>),
+as well as their interactions. The analysis involves an overall model test, interaction tests
+(two-way and three-way), and main effects tests. Results include adjusted p-values and test
+statistics for each feature.</p>
     </div>
 
     <div class="section level2">
@@ -96,8 +99,7 @@ and main effects tests. Results include adjusted p-values and test statistics fo
 
 
 <dl><dt id="arg-z">Z<a class="anchor" aria-label="anchor" href="#arg-z"></a></dt>
-<dd><p>A numeric matrix or data frame where each column represents a gene's expression (or abundance)
-and each row corresponds to an observation (e.g., a sample).</p></dd>
+<dd><p>A numeric matrix or data frame where each column represents a feature and each row represents an observation.</p></dd>
 
 
 <dt id="arg-factor-">factor1<a class="anchor" aria-label="anchor" href="#arg-factor-"></a></dt>
@@ -113,93 +115,75 @@ and each row corresponds to an observation (e.g., a sample).</p></dd>
 
 
 <dt id="arg-random-effect">random_effect<a class="anchor" aria-label="anchor" href="#arg-random-effect"></a></dt>
-<dd><p>An optional factor or vector for random effects (e.g., subject ID). Use <code>NULL</code>
-if no random effects are included.</p></dd>
+<dd><p>An optional factor or vector for random effects (e.g., subject ID). Use <code>NULL</code> if not applicable.</p></dd>
 
 
 <dt id="arg-model-fit-function">model_fit_function<a class="anchor" aria-label="anchor" href="#arg-model-fit-function"></a></dt>
-<dd><p>A character string specifying the model-fitting function (e.g., <code>"lm"</code>
-for linear models, <code>"lmer"</code> for mixed-effects models). Default is <code>"lm"</code>.</p></dd>
+<dd><p>A character string specifying the model-fitting function (e.g., <code>"lm"</code> or <code>"lmer"</code>). Defaults to <code>"lm"</code>.</p></dd>
 
 
 <dt id="arg-test-function">test_function<a class="anchor" aria-label="anchor" href="#arg-test-function"></a></dt>
-<dd><p>A character string specifying the testing function to use
-(e.g., <code>"parametric"</code>, <code>"permutation"</code>). Default is <code>"parametric"</code>.</p></dd>
+<dd><p>A character string specifying the testing function to use (e.g., <code>"parametric"</code> or <code>"permutation"</code>). Defaults to <code>"parametric"</code>.</p></dd>
 
 
 <dt id="arg-pval-quantile-cutoff">pval_quantile_cutoff<a class="anchor" aria-label="anchor" href="#arg-pval-quantile-cutoff"></a></dt>
-<dd><p>A numeric threshold for the quantile-based filtering of overall p-values
-(i.e., only genes with overall p-values below the specified quantile are considered for further tests).
-Default is <code>0.02</code>.</p></dd>
+<dd><p>A numeric threshold for the quantile-based filtering of overall p-values. Defaults to <code>0.02</code>.</p></dd>
 
 
 <dt id="arg-pval-cutoff-full">pval_cutoff_full<a class="anchor" aria-label="anchor" href="#arg-pval-cutoff-full"></a></dt>
-<dd><p>A numeric p-value cutoff for the overall model test. Default is <code>0.05</code>.</p></dd>
+<dd><p>A numeric p-value cutoff for the overall model test. Defaults to <code>0.05</code>.</p></dd>
 
 
 <dt id="arg-pval-cutoff-interaction">pval_cutoff_interaction<a class="anchor" aria-label="anchor" href="#arg-pval-cutoff-interaction"></a></dt>
-<dd><p>A numeric p-value cutoff for the omnibus interaction test (i.e., is there
-<em>any</em> interaction?). Default is <code>0.01</code>.</p></dd>
+<dd><p>A numeric p-value cutoff for the omnibus interaction test. Defaults to <code>0.01</code>.</p></dd>
 
 
 <dt id="arg-pval-cutoff-factor-">pval_cutoff_factor1<a class="anchor" aria-label="anchor" href="#arg-pval-cutoff-factor-"></a></dt>
-<dd><p>A numeric p-value cutoff for testing the main effect of <code>factor1</code>.
-Default is <code>0.01</code>.</p></dd>
+<dd><p>A numeric p-value cutoff for testing the main effect of <code>factor1</code>. Defaults to <code>0.01</code>.</p></dd>
 
 
 <dt id="arg-pval-cutoff-factor-">pval_cutoff_factor2<a class="anchor" aria-label="anchor" href="#arg-pval-cutoff-factor-"></a></dt>
-<dd><p>A numeric p-value cutoff for testing the main effect of <code>factor2</code>.
-Default is <code>0.01</code>.</p></dd>
+<dd><p>A numeric p-value cutoff for testing the main effect of <code>factor2</code>. Defaults to <code>0.01</code>.</p></dd>
 
 
 <dt id="arg-pval-cutoff-factor-">pval_cutoff_factor3<a class="anchor" aria-label="anchor" href="#arg-pval-cutoff-factor-"></a></dt>
-<dd><p>A numeric p-value cutoff for testing the main effect of <code>factor3</code>.
-Default is <code>0.01</code>.</p></dd>
+<dd><p>A numeric p-value cutoff for testing the main effect of <code>factor3</code>. Defaults to <code>0.01</code>.</p></dd>
 
 
 <dt id="arg-pval-cutoff-int-">pval_cutoff_int12<a class="anchor" aria-label="anchor" href="#arg-pval-cutoff-int-"></a></dt>
-<dd><p>A numeric p-value cutoff for the two-way interaction between <code>factor1</code>
-and <code>factor2</code>. Default is <code>0.01</code>.</p></dd>
+<dd><p>Numeric p-value cutoff for the two-way interaction between factor1 and factor2. Defaults to <code>0.01</code>.</p></dd>
 
 
 <dt id="arg-pval-cutoff-int-">pval_cutoff_int13<a class="anchor" aria-label="anchor" href="#arg-pval-cutoff-int-"></a></dt>
-<dd><p>A numeric p-value cutoff for the two-way interaction between <code>factor1</code>
-and <code>factor3</code>. Default is <code>0.01</code>.</p></dd>
+<dd><p>Numeric p-value cutoff for the two-way interaction between factor1 and factor3. Defaults to <code>0.01</code>.</p></dd>
 
 
 <dt id="arg-pval-cutoff-int-">pval_cutoff_int23<a class="anchor" aria-label="anchor" href="#arg-pval-cutoff-int-"></a></dt>
-<dd><p>A numeric p-value cutoff for the two-way interaction between <code>factor2</code>
-and <code>factor3</code>. Default is <code>0.01</code>.</p></dd>
+<dd><p>Numeric p-value cutoff for the two-way interaction between factor2 and factor3. Defaults to <code>0.01</code>.</p></dd>
 
 
 <dt id="arg-pval-cutoff-int-">pval_cutoff_int123<a class="anchor" aria-label="anchor" href="#arg-pval-cutoff-int-"></a></dt>
-<dd><p>A numeric p-value cutoff for the three-way interaction among <code>factor1</code>,
-<code>factor2</code>, and <code>factor3</code>. Default is <code>0.01</code>.</p></dd>
+<dd><p>Numeric p-value cutoff for the three-way interaction among all factors. Defaults to <code>0.01</code>.</p></dd>
 
 
 <dt id="arg-p-adjust-method">p_adjust_method<a class="anchor" aria-label="anchor" href="#arg-p-adjust-method"></a></dt>
-<dd><p>A character string specifying the method used to adjust p-values for multiple
-comparisons (e.g., <code>"BH"</code>). Default is <code>"BH"</code>.</p></dd>
+<dd><p>A character string specifying the method used to adjust p-values (e.g., <code>"BH"</code>). Defaults to <code>"BH"</code>.</p></dd>
 
 
 <dt id="arg-factor-name">factor1_name<a class="anchor" aria-label="anchor" href="#arg-factor-name"></a></dt>
-<dd><p>An optional character string to label <code>factor1</code> in outputs or formulas.
-Default is <code>NULL</code>.</p></dd>
+<dd><p>Optional label for <code>factor1</code>.</p></dd>
 
 
 <dt id="arg-factor-name">factor2_name<a class="anchor" aria-label="anchor" href="#arg-factor-name"></a></dt>
-<dd><p>An optional character string to label <code>factor2</code> in outputs or formulas.
-Default is <code>NULL</code>.</p></dd>
+<dd><p>Optional label for <code>factor2</code>.</p></dd>
 
 
 <dt id="arg-factor-name">factor3_name<a class="anchor" aria-label="anchor" href="#arg-factor-name"></a></dt>
-<dd><p>An optional character string to label <code>factor3</code> in outputs or formulas.
-Default is <code>NULL</code>.</p></dd>
+<dd><p>Optional label for <code>factor3</code>.</p></dd>
 
 
 <dt id="arg-random-effect-name">random_effect_name<a class="anchor" aria-label="anchor" href="#arg-random-effect-name"></a></dt>
-<dd><p>An optional character string to label the random effect in outputs or formulas.
-Default is <code>NULL</code>.</p></dd>
+<dd><p>Optional label for the random effect.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -278,7 +262,7 @@ p-value cutoffs.</p></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
