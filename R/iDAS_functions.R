@@ -791,7 +791,7 @@ threefactors <- function(Z, factor1, factor2, factor3, random_effect = NULL, mod
   # Initialize matrices for p-values and test statistics (9 columns)
   pval_matrix <- stat_matrix <- matrix(NA, nrow = ncol(Z), ncol = 9)
 
-  # Format factors (assumes check_factor_name3 is defined externally)
+  # Format factors with the shared current helper.
   formatted_factors <- check_factor_name(factor1_name=factor1_name, factor2_name=factor2_name,
                                   factor3_name=factor3_name, random_effect_name=random_effect_name,
                                   factor1=factor1, factor2=factor2, factor3=factor3, random_effect=random_effect)
@@ -1081,4 +1081,3 @@ iDAS <- function(Z, factor1, factor2,factor3=NULL, random_effect = NULL,
   }
   return(result)
 }
-

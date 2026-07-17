@@ -32,6 +32,7 @@
 #'
 #' @return A list of hypothesis test outcome, P_mat is the pvalue matrix of all tests,
 #' S_mat is the statistics matrix of all test, cls_df is the Classification data frame of all tests.
+# Legacy implementation retained for development reference only.
 #' @importFrom stats anova formula p.adjust
 #' @importFrom lme4 lmer
 #' @keywords internal
@@ -601,4 +602,3 @@ check_factor_name3=function(f1name,f2name,f3name,randomname,f1,f2,f3,random){
   return(list(f1_tmp=f1_tmp,f2_tmp=f2_tmp,f3_tmp=f3_tmp,
               random_tmp=random_tmp,f1=f1,f2=f2,f3=f3,random=random))
 }
-

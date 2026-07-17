@@ -20,6 +20,7 @@
 #'
 #' @return A list of hypothesis test outcomes. pval_matrix is the matrix of p-values for all tests,
 #' stat_matrix is the matrix of test statistics, and class_df is the data frame of class results.
+# Legacy implementation retained for development reference only.
 #' @importFrom stats anova formula p.adjust
 #' @importFrom lme4 lmer
 #' @keywords internal

@@ -457,7 +457,7 @@ oc_nonnormal <- iDAS::iDAS(
 #                      n_perm = 100,BPPARAM = MulticoreParam(10))
 ```
 
-#### Compare Parametric-based and Permuation-based test results
+#### Compare parametric- and permutation-based test results
 
 ```{r}
 # Extract cluster results and replace NAs in Sig1 with "non-sig"
@@ -483,10 +483,17 @@ clusterres_nonnormal$Sig1[is.na(clusterres_nonnormal$Sig1)] <- "non-sig"
 # Extract the true labels from gene names (e.g., "Model1" from "Model1_GeneX")
 true_labels <- do.call(rbind, strsplit(clusterres_null$varname, "_"))[, 1]
 
-# Compute ARI between true labels and predicted labels
-ari_true_null <- aricode::ARI(true_labels, clusterres_null$Sig1)
-ari_true_het <- aricode::ARI(true_labels, clusterres_het$Sig1)
-ari_true_nonnormal <- aricode::ARI(true_labels, clusterres_nonnormal$Sig1)
+# ARI compares partitions, so convert descriptive labels to integer cluster IDs.
+# This also avoids character-to-numeric coercion in newer aricode versions.
+true_clusters <- as.integer(factor(true_labels))
+null_clusters <- as.integer(factor(clusterres_null$Sig1))
+het_clusters <- as.integer(factor(clusterres_het$Sig1))
+nonnormal_clusters <- as.integer(factor(clusterres_nonnormal$Sig1))
+
+# Compute ARI between true and predicted partitions.
+ari_true_null <- aricode::ARI(true_clusters, null_clusters)
+ari_true_het <- aricode::ARI(true_clusters, het_clusters)
+ari_true_nonnormal <- aricode::ARI(true_clusters, nonnormal_clusters)
 
 
 
@@ -516,4 +523,3 @@ sessionInfo()
 ```
 
 </details>
-
