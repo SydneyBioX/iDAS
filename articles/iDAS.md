@@ -54,6 +54,7 @@ Here, we demostrate the functions using a simple simulation data.
 ### Two-way model
 
 ``` r
+
 library(iDAS)
 set.seed(42)
 
@@ -120,6 +121,7 @@ table(predicted = result$class_df$Sig1, truth = true_labels)
 ### Three-way model
 
 ``` r
+
 
 set.seed(42)
 Z <- matrix(rnorm(1000), ncol = 10)

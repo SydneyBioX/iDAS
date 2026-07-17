@@ -13,8 +13,8 @@
     }
   };
 </script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Simulate Pseudobulk and apply iDAS to find factor associated gene list">
 </head>
@@ -73,7 +73,7 @@
       <h1>Simulate Pseudobulk and apply iDAS to find factor associated gene list</h1>
                         <h4 data-toc-skip class="author">Lijia Yu</h4>
                         
-            <h4 data-toc-skip class="date">2026-03-18</h4>
+            <h4 data-toc-skip class="date">2026-07-17</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/SydneyBioX/iDAS/blob/main/vignettes/iDAS_simulation.Rmd" class="external-link"><code>vignettes/iDAS_simulation.Rmd</code></a></small>
       <div class="d-none name"><code>iDAS_simulation.Rmd</code></div>
@@ -525,7 +525,7 @@ produce results.</p>
 <span><span class="co">#                      p_adjust_method = "BH",test_function = "perm_anova_test",</span></span>
 <span><span class="co">#                      n_perm = 100,BPPARAM = MulticoreParam(10))</span></span></code></pre></div>
 <div class="section level4">
-<h4 id="compare-parametric-based-and-permuation-based-test-results">Compare Parametric-based and Permuation-based test results<a class="anchor" aria-label="anchor" href="#compare-parametric-based-and-permuation-based-test-results"></a>
+<h4 id="compare-parametric--and-permutation-based-test-results">Compare parametric- and permutation-based test results<a class="anchor" aria-label="anchor" href="#compare-parametric--and-permutation-based-test-results"></a>
 </h4>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Extract cluster results and replace NAs in Sig1 with "non-sig"</span></span>
@@ -551,10 +551,17 @@ produce results.</p>
 <span><span class="co"># Extract the true labels from gene names (e.g., "Model1" from "Model1_GeneX")</span></span>
 <span><span class="va">true_labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/strsplit.html" class="external-link">strsplit</a></span><span class="op">(</span><span class="va">clusterres_null</span><span class="op">$</span><span class="va">varname</span>, <span class="st">"_"</span><span class="op">)</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span></span>
 <span></span>
-<span><span class="co"># Compute ARI between true labels and predicted labels</span></span>
-<span><span class="va">ari_true_null</span> <span class="op">&lt;-</span> <span class="fu">aricode</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/aricode/man/ARI.html" class="external-link">ARI</a></span><span class="op">(</span><span class="va">true_labels</span>, <span class="va">clusterres_null</span><span class="op">$</span><span class="va">Sig1</span><span class="op">)</span></span>
-<span><span class="va">ari_true_het</span> <span class="op">&lt;-</span> <span class="fu">aricode</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/aricode/man/ARI.html" class="external-link">ARI</a></span><span class="op">(</span><span class="va">true_labels</span>, <span class="va">clusterres_het</span><span class="op">$</span><span class="va">Sig1</span><span class="op">)</span></span>
-<span><span class="va">ari_true_nonnormal</span> <span class="op">&lt;-</span> <span class="fu">aricode</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/aricode/man/ARI.html" class="external-link">ARI</a></span><span class="op">(</span><span class="va">true_labels</span>, <span class="va">clusterres_nonnormal</span><span class="op">$</span><span class="va">Sig1</span><span class="op">)</span></span>
+<span><span class="co"># ARI compares partitions, so convert descriptive labels to integer cluster IDs.</span></span>
+<span><span class="co"># This also avoids character-to-numeric coercion in newer aricode versions.</span></span>
+<span><span class="va">true_clusters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">true_labels</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">null_clusters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">clusterres_null</span><span class="op">$</span><span class="va">Sig1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">het_clusters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">clusterres_het</span><span class="op">$</span><span class="va">Sig1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">nonnormal_clusters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">clusterres_nonnormal</span><span class="op">$</span><span class="va">Sig1</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Compute ARI between true and predicted partitions.</span></span>
+<span><span class="va">ari_true_null</span> <span class="op">&lt;-</span> <span class="fu">aricode</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/aricode/man/ARI.html" class="external-link">ARI</a></span><span class="op">(</span><span class="va">true_clusters</span>, <span class="va">null_clusters</span><span class="op">)</span></span>
+<span><span class="va">ari_true_het</span> <span class="op">&lt;-</span> <span class="fu">aricode</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/aricode/man/ARI.html" class="external-link">ARI</a></span><span class="op">(</span><span class="va">true_clusters</span>, <span class="va">het_clusters</span><span class="op">)</span></span>
+<span><span class="va">ari_true_nonnormal</span> <span class="op">&lt;-</span> <span class="fu">aricode</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/aricode/man/ARI.html" class="external-link">ARI</a></span><span class="op">(</span><span class="va">true_clusters</span>, <span class="va">nonnormal_clusters</span><span class="op">)</span></span>
 <span></span>
 <span></span>
 <span></span>
@@ -579,9 +586,9 @@ produce results.</p>
 <details><summary><strong>Session Information</strong>
 </summary><div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R version 4.5.3 (2026-03-11)</span></span>
+<span><span class="co">#&gt; R version 4.6.1 (2026-06-24)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">#&gt; Running under: Ubuntu 24.04.3 LTS</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 24.04.4 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Matrix products: default</span></span>
 <span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
@@ -600,25 +607,25 @@ produce results.</p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] BiocStyle_2.38.0</span></span>
+<span><span class="co">#&gt; [1] BiocStyle_2.40.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;  [1] Matrix_1.7-4        jsonlite_2.0.0      compiler_4.5.3     </span></span>
-<span><span class="co">#&gt;  [4] BiocManager_1.30.27 Rcpp_1.1.1          iDAS_0.1.1         </span></span>
-<span><span class="co">#&gt;  [7] parallel_4.5.3      jquerylib_0.1.4     splines_4.5.3      </span></span>
+<span><span class="co">#&gt;  [1] Matrix_1.7-5        jsonlite_2.0.0      compiler_4.6.1     </span></span>
+<span><span class="co">#&gt;  [4] BiocManager_1.30.27 Rcpp_1.1.2          iDAS_0.1.1         </span></span>
+<span><span class="co">#&gt;  [7] parallel_4.6.1      jquerylib_0.1.4     splines_4.6.1      </span></span>
 <span><span class="co">#&gt; [10] systemfonts_1.3.2   textshaping_1.0.5   boot_1.3-32        </span></span>
-<span><span class="co">#&gt; [13] BiocParallel_1.44.0 yaml_2.3.12         fastmap_1.2.0      </span></span>
-<span><span class="co">#&gt; [16] aricode_1.0.3       lattice_0.22-9      R6_2.6.1           </span></span>
+<span><span class="co">#&gt; [13] BiocParallel_1.46.0 yaml_2.3.12         fastmap_1.2.0      </span></span>
+<span><span class="co">#&gt; [16] aricode_1.1.0       lattice_0.22-9      R6_2.6.1           </span></span>
 <span><span class="co">#&gt; [19] knitr_1.51          rbibutils_2.4.1     MASS_7.3-65        </span></span>
-<span><span class="co">#&gt; [22] nloptr_2.2.1        bookdown_0.46       desc_1.4.3         </span></span>
-<span><span class="co">#&gt; [25] minqa_1.2.8         bslib_0.10.0        rlang_1.1.7        </span></span>
-<span><span class="co">#&gt; [28] cachem_1.1.0        xfun_0.56           fs_1.6.7           </span></span>
-<span><span class="co">#&gt; [31] sass_0.4.10         cli_3.6.5           pkgdown_2.2.0      </span></span>
-<span><span class="co">#&gt; [34] Rdpack_2.6.6        digest_0.6.39       grid_4.5.3         </span></span>
-<span><span class="co">#&gt; [37] lme4_2.0-1          lifecycle_1.0.5     nlme_3.1-168       </span></span>
-<span><span class="co">#&gt; [40] reformulas_0.4.4    evaluate_1.0.5      codetools_0.2-20   </span></span>
-<span><span class="co">#&gt; [43] ragg_1.5.1          rmarkdown_2.30      tools_4.5.3        </span></span>
-<span><span class="co">#&gt; [46] htmltools_0.5.9</span></span></code></pre></div>
+<span><span class="co">#&gt; [22] nloptr_2.2.1        bookdown_0.47       desc_1.4.3         </span></span>
+<span><span class="co">#&gt; [25] minqa_1.2.8         bslib_0.11.0        rlang_1.3.0        </span></span>
+<span><span class="co">#&gt; [28] cachem_1.1.0        xfun_0.60           fs_2.1.0           </span></span>
+<span><span class="co">#&gt; [31] sass_0.4.10         otel_0.2.0          cli_3.6.6          </span></span>
+<span><span class="co">#&gt; [34] pkgdown_2.2.1       Rdpack_2.6.6        digest_0.6.39      </span></span>
+<span><span class="co">#&gt; [37] grid_4.6.1          lme4_2.0-6          lifecycle_1.0.5    </span></span>
+<span><span class="co">#&gt; [40] nlme_3.1-169        reformulas_0.4.4    evaluate_1.0.5     </span></span>
+<span><span class="co">#&gt; [43] codetools_0.2-20    ragg_1.5.2          rmarkdown_2.31     </span></span>
+<span><span class="co">#&gt; [46] tools_4.6.1         htmltools_0.5.9</span></span></code></pre></div>
 </details>
 </div>
 </div>
@@ -634,7 +641,7 @@ produce results.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

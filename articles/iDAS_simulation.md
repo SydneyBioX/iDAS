@@ -57,6 +57,7 @@ conditions.
 #### Functions for simulating Pseudobulk and meta information
 
 ``` r
+
 generate_sample_metadata <- function(n_samples,
                                      cell_type_props,
                                      treatment_props) {
@@ -181,6 +182,7 @@ where the assumptions of parametric-based tests may not hold, such as
 heteroscedastic residuals and non-normal residuals.
 
 ``` r
+
 generate_heteroscedastic_residuals <- function(n_samples, n_genes,
                                                cell_type_labels,
                                                treatment_labels,
@@ -267,6 +269,7 @@ where each sample represents a cell type with its treatment phenotype
 (either responding or non-responding to the therapy).
 
 ``` r
+
 n_samples <- 60 # Total number of samples
 n_genes_list <- c(50, 50, 50, 50, 50) # Number of genes per model type
 names(n_genes_list) <- c("Interaction", "Additive", "Treatment", "Celltype", "Null")
@@ -285,6 +288,7 @@ table(metadata$cell_type_labels, metadata$treatment_labels)
 ##### 1.Simulate expression data for each model (Models 1 to 5)
 
 ``` r
+
 expr_list <- lapply(1:5, function(i) {
   simulate_pseudobulk_rnaseq(n_samples,
     n_genes_list[i],
@@ -302,6 +306,7 @@ total_genes <- sum(n_genes_list)
 ##### 2.Generate error/residual matrices
 
 ``` r
+
 rho <- 0
 Sigma <- (1 - rho) * diag(total_genes) + rho * matrix(1, nrow = total_genes, ncol = total_genes)
 
@@ -330,6 +335,7 @@ homoscedastic residuals does not hold.
 of normal residuals does not hold.
 
 ``` r
+
 expr_combined_null <- expr_combined + error_terms
 expr_combined_het <- expr_combined + error_terms_het
 expr_combined_nonnormal <- expr_combined + error_terms_nonnormal
@@ -340,6 +346,7 @@ expr_combined_nonnormal <- expr_combined + error_terms_nonnormal
 True labels are embedded as the first part, e.g., “Model1”.
 
 ``` r
+
 gene_names_combined <- unlist(lapply(1:5, function(i) {
   offset <- if (i == 1) 0 else sum(n_genes_list[1:(i - 1)])
   paste0("Model", i, "_Gene", seq_len(n_genes_list[i]) + offset)
@@ -349,6 +356,7 @@ gene_names_combined <- unlist(lapply(1:5, function(i) {
 ##### 5.Generate sample names from metadata
 
 ``` r
+
 sample_names <- paste0("Sample", 1:n_samples, "_T", 
                        metadata$treatment_labels, "_C", 
                        metadata$cell_type_labels)
@@ -366,6 +374,7 @@ colnames(expr_combined_nonnormal) <- sample_names
 ##### 6.Create sample annotation (same for all simulations)
 
 ``` r
+
 sample_annotation <- data.frame(
   Treatment = factor(metadata$treatment_labels,
     labels = paste0("T", 1:length(unique(metadata$treatment_labels)))
@@ -383,6 +392,7 @@ Please note that permutation tests may take a very long time to produce
 results.
 
 ``` r
+
 oc_null <- iDAS::iDAS(
   Z = data.frame(t(expr_combined_null), check.names = FALSE),
   factor1 = sample_annotation$Cell_Type,
@@ -451,9 +461,10 @@ oc_nonnormal <- iDAS::iDAS(
 #                      n_perm = 100,BPPARAM = MulticoreParam(10))
 ```
 
-#### Compare Parametric-based and Permuation-based test results
+#### Compare parametric- and permutation-based test results
 
 ``` r
+
 # Extract cluster results and replace NAs in Sig1 with "non-sig"
 clusterres_null <- data.frame(oc_null$class_df)
 clusterres_null$Sig1[is.na(clusterres_null$Sig1)] <- "non-sig"
@@ -477,10 +488,17 @@ clusterres_nonnormal$Sig1[is.na(clusterres_nonnormal$Sig1)] <- "non-sig"
 # Extract the true labels from gene names (e.g., "Model1" from "Model1_GeneX")
 true_labels <- do.call(rbind, strsplit(clusterres_null$varname, "_"))[, 1]
 
-# Compute ARI between true labels and predicted labels
-ari_true_null <- aricode::ARI(true_labels, clusterres_null$Sig1)
-ari_true_het <- aricode::ARI(true_labels, clusterres_het$Sig1)
-ari_true_nonnormal <- aricode::ARI(true_labels, clusterres_nonnormal$Sig1)
+# ARI compares partitions, so convert descriptive labels to integer cluster IDs.
+# This also avoids character-to-numeric coercion in newer aricode versions.
+true_clusters <- as.integer(factor(true_labels))
+null_clusters <- as.integer(factor(clusterres_null$Sig1))
+het_clusters <- as.integer(factor(clusterres_het$Sig1))
+nonnormal_clusters <- as.integer(factor(clusterres_nonnormal$Sig1))
+
+# Compute ARI between true and predicted partitions.
+ari_true_null <- aricode::ARI(true_clusters, null_clusters)
+ari_true_het <- aricode::ARI(true_clusters, het_clusters)
+ari_true_nonnormal <- aricode::ARI(true_clusters, nonnormal_clusters)
 
 
 
@@ -507,10 +525,11 @@ print(ari_true_nonnormal)
 **Session Information**
 
 ``` r
+
 sessionInfo()
-#> R version 4.5.3 (2026-03-11)
+#> R version 4.6.1 (2026-06-24)
 #> Platform: x86_64-pc-linux-gnu
-#> Running under: Ubuntu 24.04.3 LTS
+#> Running under: Ubuntu 24.04.4 LTS
 #> 
 #> Matrix products: default
 #> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -529,23 +548,23 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] BiocStyle_2.38.0
+#> [1] BiocStyle_2.40.0
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] Matrix_1.7-4        jsonlite_2.0.0      compiler_4.5.3     
-#>  [4] BiocManager_1.30.27 Rcpp_1.1.1          iDAS_0.1.1         
-#>  [7] parallel_4.5.3      jquerylib_0.1.4     splines_4.5.3      
+#>  [1] Matrix_1.7-5        jsonlite_2.0.0      compiler_4.6.1     
+#>  [4] BiocManager_1.30.27 Rcpp_1.1.2          iDAS_0.1.1         
+#>  [7] parallel_4.6.1      jquerylib_0.1.4     splines_4.6.1      
 #> [10] systemfonts_1.3.2   textshaping_1.0.5   boot_1.3-32        
-#> [13] BiocParallel_1.44.0 yaml_2.3.12         fastmap_1.2.0      
-#> [16] aricode_1.0.3       lattice_0.22-9      R6_2.6.1           
+#> [13] BiocParallel_1.46.0 yaml_2.3.12         fastmap_1.2.0      
+#> [16] aricode_1.1.0       lattice_0.22-9      R6_2.6.1           
 #> [19] knitr_1.51          rbibutils_2.4.1     MASS_7.3-65        
-#> [22] nloptr_2.2.1        bookdown_0.46       desc_1.4.3         
-#> [25] minqa_1.2.8         bslib_0.10.0        rlang_1.1.7        
-#> [28] cachem_1.1.0        xfun_0.56           fs_1.6.7           
-#> [31] sass_0.4.10         cli_3.6.5           pkgdown_2.2.0      
-#> [34] Rdpack_2.6.6        digest_0.6.39       grid_4.5.3         
-#> [37] lme4_2.0-1          lifecycle_1.0.5     nlme_3.1-168       
-#> [40] reformulas_0.4.4    evaluate_1.0.5      codetools_0.2-20   
-#> [43] ragg_1.5.1          rmarkdown_2.30      tools_4.5.3        
-#> [46] htmltools_0.5.9
+#> [22] nloptr_2.2.1        bookdown_0.47       desc_1.4.3         
+#> [25] minqa_1.2.8         bslib_0.11.0        rlang_1.3.0        
+#> [28] cachem_1.1.0        xfun_0.60           fs_2.1.0           
+#> [31] sass_0.4.10         otel_0.2.0          cli_3.6.6          
+#> [34] pkgdown_2.2.1       Rdpack_2.6.6        digest_0.6.39      
+#> [37] grid_4.6.1          lme4_2.0-6          lifecycle_1.0.5    
+#> [40] nlme_3.1-169        reformulas_0.4.4    evaluate_1.0.5     
+#> [43] codetools_0.2-20    ragg_1.5.2          rmarkdown_2.31     
+#> [46] tools_4.6.1         htmltools_0.5.9
 ```

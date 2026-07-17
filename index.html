@@ -13,8 +13,8 @@
     }
   };
 </script><script src="lightswitch.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Interpretable differential abundance analysis">
 <meta name="description" content="Single-cell technologies have revolutionized our understanding of cellular dynamics by allowing researchers to investigate individual cell responses under various conditions, such as comparing diseased versus healthy states. To better interpret the gene signatures generated in the differential abundance analysis, we developed iDAS to classify the gene signatures into multiple categories.">
@@ -69,66 +69,178 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="idas">iDAS<a class="anchor" aria-label="anchor" href="#idas"></a>
 </h1></div>
-<p>Interpretable Differential Abundance Signature</p>
-<p>Single-cell technologies have revolutionized our understanding of cellular dynamics by allowing researchers to investigate individual cell responses under various conditions, such as comparing diseased versus healthy states. Many differential abundance methods have been developed in this field, however, the understanding of the gene signatures obtained from those methods is often incomplete, requiring the integration of cell type information and other biological factors to yield interpretable and meaningful results. To better interpret the gene signatures generated in the differential abundance analysis, we developed iDAS to classify the gene signatures into multiple categories.</p>
+<p><strong>Interpretable Differential Abundance Signature</strong></p>
+<p>iDAS is an R package for interpreting gene signatures obtained after a differential abundance (DA) analysis. It uses a two-stage, ANOVA-based framework to classify features according to the experimental factors and interactions that explain their variation. This helps distinguish, for example, signatures shared across cell states from cell-state-specific treatment-response signatures.</p>
+<p>iDAS supports:</p>
+<ul>
+<li>two- and three-factor experimental designs;</li>
+<li>fixed-effects models (<code>lm</code>) and mixed-effects models (<code>lmer</code>);</li>
+<li>parametric ANOVA and permutation-based tests; and</li>
+<li>input derived from any upstream DA method, including <a href="https://github.com/MarioniLab/miloR" class="external-link">miloR</a>, <a href="https://github.com/KlugerLab/DAseq" class="external-link">DA-seq</a>, and <a href="https://github.com/sunduanchen/Scissor" class="external-link">Scissor</a>.</li>
+</ul>
+<p>The method was developed for pseudobulk single-cell data and can also be used with other feature matrices and spatial summary measures when the model assumptions are appropriate. See the <a href="https://doi.org/10.1002/smtd.202500572" class="external-link">iDAS paper</a> for the complete framework, case studies, and discussion of limitations.</p>
 <div class="float">
-<img src="./reference/figures/iDAS_workflow.png" alt="idas_workflow"><div class="figcaption">idas_workflow</div>
+<img src="./reference/figures/iDAS_workflow.png" alt="Overview of the iDAS workflow"><div class="figcaption">Overview of the iDAS workflow</div>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>The iDAS package is still under development to meet Bioconductor standards. If you have any questions, please don’t hesitate to open an issue.</p>
-<pre><code><span><span class="co">## install from github</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"SydneyBioX/iDAS"</span><span class="op">)</span></span></code></pre>
+<p>iDAS is under active development toward Bioconductor standards. Install the development version from GitHub:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"SydneyBioX/iDAS"</span><span class="op">)</span></span></code></pre></div>
+<p>Then load the package:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sydneybiox.github.io/iDAS/">iDAS</a></span><span class="op">)</span></span></code></pre></div>
+<p>Please report bugs or request features through the <a href="https://github.com/SydneyBioX/iDAS/issues" class="external-link">GitHub issue tracker</a>.</p>
 </div>
 <div class="section level2">
-<h2 id="example-command">Example command<a class="anchor" aria-label="anchor" href="#example-command"></a>
+<h2 id="input-format">Input format<a class="anchor" aria-label="anchor" href="#input-format"></a>
 </h2>
-<pre><code><span><span class="co"># Example using two factors</span></span>
-<span><span class="va">result_twoway</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/iDAS.html">iDAS</a></span><span class="op">(</span>Z <span class="op">=</span> <span class="va">my_feature_matrix</span>,</span>
-<span>                      factor1 <span class="op">=</span> <span class="va">group1</span>,</span>
-<span>                      factor2 <span class="op">=</span> <span class="va">group2</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Example using three factors</span></span>
-<span><span class="va">result_threeway</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/iDAS.html">iDAS</a></span><span class="op">(</span>Z <span class="op">=</span> <span class="va">my_feature_matrix</span>,</span>
-<span>                        factor1 <span class="op">=</span> <span class="va">group1</span>,</span>
-<span>                        factor2 <span class="op">=</span> <span class="va">group2</span>,</span>
-<span>                        factor3 <span class="op">=</span> <span class="va">timepoint</span><span class="op">)</span></span></code></pre>
-<div class="section level3">
-<h3 id="simulation-example">Simulation example<a class="anchor" aria-label="anchor" href="#simulation-example"></a>
-</h3>
-<p>Here, we provide some simple simulation example to show how to use iDAS function.</p>
-<pre><code><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span><span class="va">Z</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">Z</span><span class="op">)</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"gene"</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span>
-<span><span class="va">factor1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, each <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">factor2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, times <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">factor3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, length.out <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Run the differential analysis using iDAS</span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/iDAS.html">iDAS</a></span><span class="op">(</span></span>
-<span>  <span class="va">Z</span>, <span class="va">factor1</span>, <span class="va">factor2</span>, <span class="va">factor3</span>,</span>
-<span>  model_fit_function <span class="op">=</span> <span class="st">"lm"</span>,</span>
-<span>  test_function <span class="op">=</span> <span class="st">"parametric"</span>,</span>
-<span>  pval_quantile_cutoff <span class="op">=</span> <span class="fl">0.02</span>,</span>
-<span>  pval_cutoff_full <span class="op">=</span> <span class="fl">0.05</span>,</span>
-<span>  pval_cutoff_interaction <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span>  pval_cutoff_factor1 <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span>  pval_cutoff_factor2 <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span>  pval_cutoff_factor3 <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span>  pval_cutoff_int12 <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span>  pval_cutoff_int13 <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span>  pval_cutoff_int23 <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span>  pval_cutoff_int123 <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span>  p_adjust_method <span class="op">=</span> <span class="st">"BH"</span></span>
-<span><span class="op">)</span></span></code></pre>
-<p>Results include three table, the p-value (or adjusted p-value) table, F-statistics table, and the gene associated groups.</p>
-<p>The <code>Sig0</code> column represents the test result from the full model. <code>Intornotint</code> indicates whether a significant interaction effect is present. <code>F1</code>, <code>F2</code>, and <code>F3</code> represent tests for gene associations with the main effects of Factor 1, Factor 2, and Factor 3, respectively. <code>Twowaysorthreeways</code> distinguishes whether the interaction effect is a two-way or three-way interaction. <code>F1F2</code>, <code>F2F3</code>, and <code>F1F3</code> correspond to the three types of two-way interaction effects.</p>
-<pre><code><span><span class="co"># Inspect results</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">pval_matrix</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">stat_matrix</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">class_df</span><span class="op">)</span></span></code></pre>
+<p>The main <code><a href="reference/iDAS.html">iDAS()</a></code> function expects:</p>
+<ul>
+<li>
+<code>Z</code>: a numeric matrix or data frame with <strong>observations in rows</strong> and <strong>features (for example, genes) in columns</strong>;</li>
+<li>
+<code>factor1</code> and <code>factor2</code>: vectors with one value per row of <code>Z</code>;</li>
+<li>
+<code>factor3</code>: an optional third factor; and</li>
+<li>
+<code>random_effect</code>: an optional grouping vector, such as patient ID, for repeated-measures designs.</li>
+</ul>
+<p>For single-cell RNA-seq, we recommend aggregating expression into pseudobulk observations (for example, one row per patient and cell state), then applying an appropriate transformation before iDAS. The paper uses log2-transformed pseudobulk expression. Avoid treating individual cells from the same biological sample as independent replicates.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">Z</span><span class="op">)</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">factor1</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">Z</span><span class="op">)</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">factor2</span><span class="op">)</span>,</span>
+<span>  <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">Z</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
+<div class="section level2">
+<h2 id="quick-start-two-factor-analysis">Quick start: two-factor analysis<a class="anchor" aria-label="anchor" href="#quick-start-two-factor-analysis"></a>
+</h2>
+<p>This reproducible example simulates 40 pseudobulk observations and 20 genes. The first five genes have a treatment-by-cell-state interaction.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">40</span></span>
+<span><span class="va">cell_state</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"State_A"</span>, <span class="st">"State_B"</span><span class="op">)</span>, each <span class="op">=</span> <span class="va">n</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">response</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Responder"</span>, <span class="st">"Non_responder"</span><span class="op">)</span>, each <span class="op">=</span> <span class="va">n</span> <span class="op">/</span> <span class="fl">4</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">Z</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">20</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="va">n</span>, ncol <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">Z</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"gene"</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">Z</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Add an interaction signal to genes 1-5.</span></span>
+<span><span class="va">interaction_group</span> <span class="op">&lt;-</span> <span class="va">cell_state</span> <span class="op">==</span> <span class="st">"State_B"</span> <span class="op">&amp;</span> <span class="va">response</span> <span class="op">==</span> <span class="st">"Responder"</span></span>
+<span><span class="va">Z</span><span class="op">[</span><span class="va">interaction_group</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">Z</span><span class="op">[</span><span class="va">interaction_group</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="op">+</span> <span class="fl">3</span></span>
+<span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/iDAS.html">iDAS</a></span><span class="op">(</span></span>
+<span>  Z <span class="op">=</span> <span class="va">Z</span>,</span>
+<span>  factor1 <span class="op">=</span> <span class="va">cell_state</span>,</span>
+<span>  factor2 <span class="op">=</span> <span class="va">response</span>,</span>
+<span>  pval_quantile_cutoff <span class="op">=</span> <span class="cn">NULL</span>, <span class="co"># use pval_cutoff_full instead</span></span>
+<span>  pval_cutoff_full <span class="op">=</span> <span class="fl">0.05</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">class_df</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">pval_matrix</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">stat_matrix</span><span class="op">)</span></span></code></pre></div>
+<p>By default, <code>pval_quantile_cutoff = 0.02</code> retains the top 2% of features ranked by adjusted full-model p-value. Set it to <code>NULL</code>, as above, to use the fixed <code>pval_cutoff_full</code> threshold instead.</p>
+</div>
+<div class="section level2">
+<h2 id="repeated-measures-and-three-factor-designs">Repeated measures and three-factor designs<a class="anchor" aria-label="anchor" href="#repeated-measures-and-three-factor-designs"></a>
+</h2>
+<p>Use a mixed-effects model when observations are repeated within subjects:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">result_mixed</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/iDAS.html">iDAS</a></span><span class="op">(</span></span>
+<span>  Z <span class="op">=</span> <span class="va">Z</span>,</span>
+<span>  factor1 <span class="op">=</span> <span class="va">cell_state</span>,</span>
+<span>  factor2 <span class="op">=</span> <span class="va">response</span>,</span>
+<span>  random_effect <span class="op">=</span> <span class="va">patient_id</span>,</span>
+<span>  model_fit_function <span class="op">=</span> <span class="st">"lmer"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Supplying <code>factor3</code> automatically selects the three-factor analysis. For example, a longitudinal study might model cell state, response, and timepoint, with patient ID as a random effect:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">result_three_factor</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/iDAS.html">iDAS</a></span><span class="op">(</span></span>
+<span>  Z <span class="op">=</span> <span class="va">Z_longitudinal</span>,</span>
+<span>  factor1 <span class="op">=</span> <span class="va">cell_state</span>,</span>
+<span>  factor2 <span class="op">=</span> <span class="va">response</span>,</span>
+<span>  factor3 <span class="op">=</span> <span class="va">timepoint</span>,</span>
+<span>  random_effect <span class="op">=</span> <span class="va">patient_id</span>,</span>
+<span>  model_fit_function <span class="op">=</span> <span class="st">"lmer"</span>,</span>
+<span>  pval_cutoff_factor3 <span class="op">=</span> <span class="fl">0.01</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Use <code>model_fit_function = "lm"</code> only when <code>random_effect = NULL</code>; use <code>model_fit_function = "lmer"</code> when a random effect is supplied.</p>
+</div>
+<div class="section level2">
+<h2 id="understanding-the-results">Understanding the results<a class="anchor" aria-label="anchor" href="#understanding-the-results"></a>
+</h2>
+<p><code><a href="reference/iDAS.html">iDAS()</a></code> returns a list with three elements:</p>
+<ul>
+<li>
+<code>pval_matrix</code>: p-values (adjusted where requested) for the nested model comparisons;</li>
+<li>
+<code>stat_matrix</code>: the corresponding test statistics; and</li>
+<li>
+<code>class_df</code>: the feature-level signature classifications.</li>
+</ul>
+<p>For a two-factor analysis, <code>class_df$Sig0</code> reports whether a feature passed the full-model screen. For retained features, <code>class_df$Sig1</code> is one of:</p>
+<ul>
+<li>
+<code>Interaction</code>: the association depends on the combination of factors;</li>
+<li>
+<code>Factor1</code>: primarily associated with factor 1;</li>
+<li>
+<code>Factor2</code>: primarily associated with factor 2; or</li>
+<li>
+<code>Additive</code>: associated with the additive model but not assigned exclusively to one factor.</li>
+</ul>
+<p>The two-factor p-value and statistic matrices contain <code>Full</code>, <code>Interaction</code>, <code>Factor1</code>, and <code>Factor2</code> columns. Three-factor results additionally separate main effects (<code>F1</code>, <code>F2</code>, and <code>F3</code>), two-way interactions (<code>F1F2</code>, <code>F1F3</code>, and <code>F2F3</code>), and three-way interactions. Follow-up entries are <code>NA</code> when a feature did not reach the preceding stage of the hierarchical testing procedure.</p>
+<p>For full argument documentation, run:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="op">?</span><span class="va">iDAS</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span><span class="st">"iDAS"</span>, package <span class="op">=</span> <span class="st">"iDAS"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="statistical-considerations">Statistical considerations<a class="anchor" aria-label="anchor" href="#statistical-considerations"></a>
+</h2>
+<p>iDAS is intended to interpret candidate signatures, not to replace the upstream DA analysis. Results can depend on the chosen DA method and on the quality of the labels passed as factors. The parametric test assumes that the linear-model assumptions are reasonable. A permutation test is available for settings where these assumptions are questionable:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">result_permutation</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/iDAS.html">iDAS</a></span><span class="op">(</span></span>
+<span>  Z <span class="op">=</span> <span class="va">Z</span>,</span>
+<span>  factor1 <span class="op">=</span> <span class="va">cell_state</span>,</span>
+<span>  factor2 <span class="op">=</span> <span class="va">response</span>,</span>
+<span>  test_function <span class="op">=</span> <span class="st">"permutation"</span>,</span>
+<span>  n_perm <span class="op">=</span> <span class="fl">1000</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Permutation testing is substantially slower, especially for large feature sets. iDAS currently supports at most three factors; interaction complexity and power become limiting as factors are added.</p>
+</div>
+<div class="section level2">
+<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
+</h2>
+<p>If you use iDAS in your research, please cite:</p>
+<blockquote>
+<p>Yu, L., Lin, Y., Xu, X., Yang, P., and Yang, J. Y. H. (2026). Interpretable Differential Abundance Signature (iDAS). <em>Small Methods</em>, <strong>10</strong>(2), e2500572. <a href="https://doi.org/10.1002/smtd.202500572" class="external-link uri">https://doi.org/10.1002/smtd.202500572</a></p>
+</blockquote>
+<p>BibTeX:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bibtex"><code class="sourceCode bibtex"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="va">@article</span>{<span class="ot">Yu2026iDAS</span>,</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="dt">author</span>  = {Yu, Lijia and Lin, Yingxin and Xu, Xiangnan and Yang, Pengyi and Yang, Jean Y. H.},</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="dt">title</span>   = {Interpretable Differential Abundance Signature ({iDAS})},</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  <span class="dt">journal</span> = {Small Methods},</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>  <span class="dt">year</span>    = {2026},</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>  <span class="dt">volume</span>  = {10},</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>  <span class="dt">number</span>  = {2},</span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>  <span class="dt">pages</span>   = {e2500572},</span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>  <span class="dt">doi</span>     = {10.1002/smtd.202500572}</span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
+</h2>
+<p>iDAS is released under the GPL license.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -176,7 +288,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>
