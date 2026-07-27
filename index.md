@@ -1,4 +1,4 @@
-# iDAS
+# iDAS [![](https://i.imgur.com/O25crxx.png "iDAS hex sticker")](https://github.com/SydneyBioX/iDAS)
 
 **Interpretable Differential Abundance Signature**
 
